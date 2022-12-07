@@ -11,13 +11,17 @@
 TForm1 *Form1;
 bool programingChange = false;
 bool pen = false;
+bool line = false;
+int imgx0, imgy0;
 TStringList* imageLog;
+TBitmap* buffer;
 
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
 	imageLog = new TStringList();
+    buffer = new TBitmap();
 }
 //---------------------------------------------------------------------------
 
@@ -91,6 +95,8 @@ void TForm1::setBrushColor(TColor value)
 void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y)
 {
+	imgx0 = X;
+    imgy0 = Y;
 	if (sbPencil->Down)
 	{
 		pen = true;
@@ -99,26 +105,48 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 		imageLog->Add(IntToStr(X));
 		imageLog->Add(IntToStr(Y));
 	}
+	if (sbLine->Down)
+	{
+		line = true;
+		((TImage*)Sender)->Canvas->MoveTo(X,Y);
+		imageLog->Add("#Move");
+		imageLog->Add(IntToStr(X));
+		imageLog->Add(IntToStr(Y));
+        buffer->Assign(Image1->Picture->Bitmap);
+	}
 
 
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int X,
-          int Y)
+		  int Y)
 {
 	if (pen)
 	{
 		((TImage*)Sender)->Canvas->LineTo(X,Y);
-        imageLog->Add("#Line");
+		imageLog->Add("#Line");
 		imageLog->Add(IntToStr(X));
 		imageLog->Add(IntToStr(Y));
+	}
+	if (line)
+	{
+		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
+		((TImage*)Sender)->Canvas->MoveTo(imgx0,imgy0);
+		((TImage*)Sender)->Canvas->LineTo(X,Y);
 	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y)
 {
-    pen = false;
+	if (line)
+	{
+        imageLog->Add("#Line");
+		imageLog->Add(IntToStr(X));
+		imageLog->Add(IntToStr(Y));
+	}
+    line = false;
+	pen = false;
 }
 //---------------------------------------------------------------------------
 

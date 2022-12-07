@@ -18,7 +18,7 @@ __published:	// IDE-managed Components
 	TImage *Image1;
 	TPanel *Panel1;
 	TSpeedButton *sbPencil;
-	TSpeedButton *SpeedButton2;
+	TSpeedButton *sbLine;
 	TSpeedButton *SpeedButton3;
 	TSpeedButton *SpeedButton4;
 	TSpeedButton *SpeedButton5;

@@ -43,12 +43,13 @@ object Form1: TForm1
       GroupIndex = 1
       Caption = 'S'
     end
-    object SpeedButton2: TSpeedButton
+    object sbLine: TSpeedButton
       Left = 47
       Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
+      Caption = '/'
     end
     object SpeedButton3: TSpeedButton
       Left = 86
