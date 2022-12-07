@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2022.12.07 17:18:03.524,=E:\user_02\source\Project1PCH1.h</Transaction>
+    <Transaction>2022.12.07 17:18:03.841,=E:\user_02\source\Unit1.cpp</Transaction>
+    <Transaction>2022.12.07 17:18:58.759,E:\user_02\source\#OIPZ\RAD\LR11\Unit1.dfm=E:\user_02\source\Unit1.dfm</Transaction>
+    <Transaction>2022.12.07 17:18:58.759,E:\user_02\source\#OIPZ\RAD\LR11\Unit1.cpp=E:\user_02\source\Unit1.cpp</Transaction>
+    <Transaction>2022.12.07 17:18:58.759,E:\user_02\source\#OIPZ\RAD\LR11\Unit1.h=E:\user_02\source\Unit1.h</Transaction>
+    <Transaction>2022.12.07 17:18:59.918,E:\user_02\source\#OIPZ\RAD\LR11\Project1PCH1.h=E:\user_02\source\Project1PCH1.h</Transaction>
+    <Transaction>2022.12.07 17:19:00.654,E:\user_02\source\#OIPZ\RAD\LR11\Project1.cbproj=E:\user_02\source\Project1.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>
