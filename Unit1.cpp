@@ -5,10 +5,13 @@
 
 #include "Unit1.h"
 #include "Unit2.h"
+#include "Graph.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TForm1 *Form1;
+Graph <TStringList*, int>history;
+Node <TStringList*, int>* curNode;
 bool programingChange = false;
 bool pen = false;
 bool line = false;
@@ -21,7 +24,11 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
 	imageLog = new TStringList();
-    buffer = new TBitmap();
+	buffer = new TBitmap();
+	Node <TStringList*, int>* start = new Node <TStringList*, int>(0);
+	Node <TStringList*, int>* end = new Node <TStringList*, int>(0);
+	history.CreateGraph(start,end, imageLog);
+    curNode = end;
 }
 //---------------------------------------------------------------------------
 
