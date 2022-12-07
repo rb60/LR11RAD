@@ -31,6 +31,10 @@ __published:	// IDE-managed Components
 	TOpenDialog *OpenDialog1;
 	TSaveDialog *SaveDialog1;
 	TMenuItem *View1;
+	TShape *Shape1;
+	TShape *Shape2;
+	TColorBox *ColorBox1;
+	TColorBox *ColorBox2;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -39,8 +43,18 @@ __published:	// IDE-managed Components
 	void __fastcall Save1Click(TObject *Sender);
 	void __fastcall Save2Click(TObject *Sender);
 	void __fastcall View1Click(TObject *Sender);
+	void __fastcall ColorBox1Change(TObject *Sender);
+	void __fastcall ColorBox2Change(TObject *Sender);
 
 private:	// User declarations
+    void readLog(TStringList* imglog);
+	__property TColor PenColor = {read = getPenColor, write = setPenColor};
+	__property TColor BrushColor = {read = getBrushColor, write = setBrushColor};
+	TColor getPenColor();
+	TColor getBrushColor();
+	void setPenColor(TColor value);
+	void setBrushColor(TColor value);
+
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
 };

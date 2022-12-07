@@ -9,6 +9,7 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TForm1 *Form1;
+bool programingChange = false;
 bool pen = false;
 TStringList* imageLog;
 
@@ -20,7 +21,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
-void readLog(TStringList* imglog, TImage* img)
+void TForm1::readLog(TStringList* imglog)
 {
 	for (int i = 0; i < imglog->Count; i++)
 	{
@@ -30,7 +31,7 @@ void readLog(TStringList* imglog, TImage* img)
 			int x = StrToInt(imglog->Strings[i]);
 			i++;
 			int y = StrToInt(imglog->Strings[i]);
-			img->Canvas->MoveTo(x,y);
+			Image1->Canvas->MoveTo(x,y);
             continue;
 		}
 		else if (imglog->Strings[i] == "#Line")
@@ -39,10 +40,52 @@ void readLog(TStringList* imglog, TImage* img)
 			int x = StrToInt(imglog->Strings[i]);
 			i++;
 			int y = StrToInt(imglog->Strings[i]);
-			img->Canvas->LineTo(x,y);
+			Image1->Canvas->LineTo(x,y);
+			continue;
+		}
+        else if (imglog->Strings[i] == "#PenColor")
+		{
+			i++;
+			TColor c = (TColor)StrToInt(imglog->Strings[i]);
+			PenColor = c;
+			continue;
+		}
+        else if (imglog->Strings[i] == "#BrushColor")
+		{
+			i++;
+			TColor c = (TColor)StrToInt(imglog->Strings[i]);
+            BrushColor = c;
 			continue;
 		}
 	}
+}
+
+TColor TForm1::getPenColor()
+{
+    return Shape1->Brush->Color;
+}
+
+TColor TForm1::getBrushColor()
+{
+    return Shape2->Brush->Color;
+}
+
+void TForm1::setPenColor(TColor value)
+{
+	Image1->Canvas->Pen->Color = value;
+	Shape1->Brush->Color = value;
+	programingChange = true;
+	ColorBox1->Selected = value;
+    programingChange = false;
+}
+
+void TForm1::setBrushColor(TColor value)
+{
+	Image1->Canvas->Brush->Color = value;
+	Shape2->Brush->Color = value;
+    programingChange = true;
+	ColorBox2->Selected = value;
+	programingChange = false;
 }
 
 void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
@@ -94,7 +137,7 @@ void __fastcall TForm1::Save2Click(TObject *Sender)
 	if (OpenDialog1->Execute() == mrOk)
 	{
 		imageLog->LoadFromFile(OpenDialog1->FileName);
-        readLog(imageLog, Image1);
+        readLog(imageLog);
 	}
 }
 //---------------------------------------------------------------------------
@@ -104,6 +147,31 @@ void __fastcall TForm1::View1Click(TObject *Sender)
 {
 	Form2->Memo1->Lines = imageLog;
 	Form2->Show();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::ColorBox1Change(TObject *Sender)
+{
+	if (!programingChange)
+	{
+        PenColor = ((TColorBox*)Sender)->Selected;
+		imageLog->Add("#PenColor");
+		imageLog->Add(IntToStr(((TColorBox*)Sender)->Selected));
+	}
+
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::ColorBox2Change(TObject *Sender)
+{
+	if (!programingChange)
+	{
+    	BrushColor = ((TColorBox*)Sender)->Selected;
+		imageLog->Add("#BrushColor");
+		imageLog->Add(IntToStr(((TColorBox*)Sender)->Selected));
+	}
+
 }
 //---------------------------------------------------------------------------
 

@@ -34,6 +34,7 @@ object Form1: TForm1
     Height = 65
     Align = alTop
     TabOrder = 0
+    ExplicitTop = -6
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -79,10 +80,40 @@ object Form1: TForm1
     end
     object SpeedButton7: TSpeedButton
       Left = 242
-      Top = 8
+      Top = 10
       Width = 33
       Height = 33
       GroupIndex = 1
+    end
+    object Shape1: TShape
+      Left = 312
+      Top = 19
+      Width = 40
+      Height = 40
+      Brush.Color = clBlack
+    end
+    object Shape2: TShape
+      Left = 368
+      Top = 19
+      Width = 40
+      Height = 40
+    end
+    object ColorBox1: TColorBox
+      Left = 424
+      Top = 8
+      Width = 145
+      Height = 22
+      TabOrder = 0
+      OnChange = ColorBox1Change
+    end
+    object ColorBox2: TColorBox
+      Left = 424
+      Top = 36
+      Width = 145
+      Height = 22
+      Selected = clWhite
+      TabOrder = 1
+      OnChange = ColorBox2Change
     end
   end
   object MainMenu1: TMainMenu
