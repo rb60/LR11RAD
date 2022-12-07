@@ -11,6 +11,7 @@ object Form1: TForm1
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Menu = MainMenu1
   TextHeight = 15
   object Image1: TImage
     Left = 0
@@ -33,13 +34,13 @@ object Form1: TForm1
     Height = 65
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 625
-    object spPencil: TSpeedButton
+    object sbPencil: TSpeedButton
       Left = 8
       Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
+      Caption = 'S'
     end
     object SpeedButton2: TSpeedButton
       Left = 47
@@ -83,5 +84,32 @@ object Form1: TForm1
       Height = 33
       GroupIndex = 1
     end
+  end
+  object MainMenu1: TMainMenu
+    Left = 416
+    Top = 144
+    object Log1: TMenuItem
+      Caption = 'Log'
+      object Save1: TMenuItem
+        Caption = 'Save'
+        OnClick = Save1Click
+      end
+      object Save2: TMenuItem
+        Caption = 'Open'
+        OnClick = Save2Click
+      end
+      object View1: TMenuItem
+        Caption = 'View'
+        OnClick = View1Click
+      end
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 200
+    Top = 136
+  end
+  object SaveDialog1: TSaveDialog
+    Left = 96
+    Top = 168
   end
 end
