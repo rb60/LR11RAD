@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 441
-  ClientWidth = 624
+  ClientWidth = 748
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -16,7 +16,7 @@ object Form1: TForm1
   object Image1: TImage
     Left = 0
     Top = 65
-    Width = 624
+    Width = 748
     Height = 376
     Align = alClient
     OnMouseDown = Image1MouseDown
@@ -30,11 +30,12 @@ object Form1: TForm1
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 624
+    Width = 748
     Height = 65
     Align = alTop
     TabOrder = 0
-    ExplicitTop = -6
+    ExplicitLeft = 128
+    ExplicitTop = 8
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -87,20 +88,20 @@ object Form1: TForm1
       GroupIndex = 1
     end
     object Shape1: TShape
-      Left = 312
+      Left = 428
       Top = 19
       Width = 40
       Height = 40
       Brush.Color = clBlack
     end
     object Shape2: TShape
-      Left = 368
+      Left = 474
       Top = 19
       Width = 40
       Height = 40
     end
     object ColorBox1: TColorBox
-      Left = 424
+      Left = 520
       Top = 8
       Width = 145
       Height = 22
@@ -108,13 +109,25 @@ object Form1: TForm1
       OnChange = ColorBox1Change
     end
     object ColorBox2: TColorBox
-      Left = 424
+      Left = 520
       Top = 36
       Width = 145
       Height = 22
       Selected = clWhite
       TabOrder = 1
       OnChange = ColorBox2Change
+    end
+    object NumberBox1: TNumberBox
+      Left = 373
+      Top = 22
+      Width = 49
+      Height = 23
+      MinValue = 1.000000000000000000
+      MaxValue = 5.000000000000000000
+      TabOrder = 2
+      Value = 1.000000000000000000
+      SpinButtonOptions.Placement = nbspCompact
+      OnChangeValue = NumberBox1ChangeValue
     end
   end
   object MainMenu1: TMainMenu

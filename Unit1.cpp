@@ -61,17 +61,37 @@ void TForm1::readLog(TStringList* imglog)
             BrushColor = c;
 			continue;
 		}
+        else if (imglog->Strings[i] == "#PenWidth")
+		{
+			i++;
+			int w = StrToInt(imglog->Strings[i]);
+			PenWidth = w;
+			continue;
+		}
 	}
+}
+
+int TForm1::getPenWidth()
+{
+    return Image1->Canvas->Pen->Width;
 }
 
 TColor TForm1::getPenColor()
 {
-    return Shape1->Brush->Color;
+	return Image1->Canvas->Pen->Color;
 }
 
 TColor TForm1::getBrushColor()
 {
-    return Shape2->Brush->Color;
+    return Image1->Canvas->Brush->Color;
+}
+
+void TForm1::setPenWidth(int value)
+{
+	Image1->Canvas->Pen->Width = value;
+    programingChange = true;
+	NumberBox1->Value = value;
+    programingChange = false;
 }
 
 void TForm1::setPenColor(TColor value)
@@ -198,6 +218,18 @@ void __fastcall TForm1::ColorBox2Change(TObject *Sender)
     	BrushColor = ((TColorBox*)Sender)->Selected;
 		imageLog->Add("#BrushColor");
 		imageLog->Add(IntToStr(((TColorBox*)Sender)->Selected));
+	}
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::NumberBox1ChangeValue(TObject *Sender)
+{
+	if (!programingChange)
+	{
+        Image1->Canvas->Pen->Width = ((TNumberBox*)Sender)->Value;
+		imageLog->Add("#PenWidth");
+		imageLog->Add(IntToStr((int)((TNumberBox*)Sender)->Value));
 	}
 
 }

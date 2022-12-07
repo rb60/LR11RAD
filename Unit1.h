@@ -11,6 +11,7 @@
 #include <Vcl.Buttons.hpp>
 #include <Vcl.Menus.hpp>
 #include <Vcl.Dialogs.hpp>
+#include <Vcl.NumberBox.hpp>
 //---------------------------------------------------------------------------
 class TForm1 : public TForm
 {
@@ -35,6 +36,7 @@ __published:	// IDE-managed Components
 	TShape *Shape2;
 	TColorBox *ColorBox1;
 	TColorBox *ColorBox2;
+	TNumberBox *NumberBox1;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -45,13 +47,17 @@ __published:	// IDE-managed Components
 	void __fastcall View1Click(TObject *Sender);
 	void __fastcall ColorBox1Change(TObject *Sender);
 	void __fastcall ColorBox2Change(TObject *Sender);
+	void __fastcall NumberBox1ChangeValue(TObject *Sender);
 
 private:	// User declarations
     void readLog(TStringList* imglog);
 	__property TColor PenColor = {read = getPenColor, write = setPenColor};
 	__property TColor BrushColor = {read = getBrushColor, write = setBrushColor};
+	__property int PenWidth = {read = getPenWidth, write = setPenWidth};
+	int getPenWidth();
 	TColor getPenColor();
 	TColor getBrushColor();
+	void setPenWidth(int value);
 	void setPenColor(TColor value);
 	void setBrushColor(TColor value);
 
