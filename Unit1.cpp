@@ -10,8 +10,10 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 TForm1 *Form1;
+TForm2 *Tree;
 Graph <TStringList*, int> *history;
 Node <TStringList*, int>* curNode;
+int nodeCount = 0;
 bool programingChange = false;
 bool pen = false;
 bool line = false;
@@ -23,29 +25,60 @@ TBitmap* buffer;
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
+    Tree = new TForm2(this);
+
 	imageLog = new TStringList();
 	buffer = new TBitmap();
 
 	history = new Graph<TStringList*, int>();
-	Node <TStringList*, int>* start = new Node <TStringList*, int>(0);
-	Node <TStringList*, int>* end = new Node <TStringList*, int>(0);
+	Node <TStringList*, int>* start = new Node <TStringList*, int>(nodeCount++);
+	Node <TStringList*, int>* end = new Node <TStringList*, int>(nodeCount++);
 	TStringList* firstLog = new TStringList();
 	history->CreateGraph(start,end, firstLog);
 	curNode = end;
 }
 //---------------------------------------------------------------------------
 
+TStringList* GraphString(Graph <TStringList*, int> *g)
+{
+   TStringList* result = new TStringList();
+   for (int i = 0; i < g->nodes.size(); i++)
+   {
+		result->Add("Node #" + IntToStr(g->nodes[i]->data));
+		for (int j = 0; j < g->nodes[i]->out.size(); j++)
+		{
+			result->Add("\tConection to Node#" + IntToStr(g->nodes[i]->out[j]->end->data));
+			result->AddStrings(g->nodes[i]->out[j]->data);
+		}
+        result->Add("");
+   }
+   return result;
+
+
+}
+
 
 void separateBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur, bool before = true)
 {
 
 	TStringList* newList = new TStringList();
-	Node<TStringList*, int> *newNode = new Node <TStringList*, int>(0);
+	Node<TStringList*, int> *newNode = new Node <TStringList*, int>(nodeCount++);
 	if (before)
 	{
-		newList->Add(cur->in[0]->data->Strings[cur->in[0]->data->Count - 1]);
-		cur->in[0]->data->Delete(cur->in[0]->data->Count - 1);
-		g->addNode(cur->in[0]->start	,newNode , cur, cur->in[0]->data, newList);
+        String currentStr;
+		do
+		{
+			currentStr = cur->in[0]->data->Strings[cur->in[0]->data->Count - 1];
+			newList->Insert(0, currentStr);
+			cur->in[0]->data->Delete(cur->in[0]->data->Count - 1);
+		}
+		while(	currentStr != "#Move" &&
+				currentStr != "#PenColor" &&
+				currentStr != "#BrushColor" &&
+				currentStr != "#PenWidth" &&
+				cur->in[0]->data->Count > 0);
+
+		g->addNode(cur->in[0]->start ,newNode , cur, cur->in[0]->data, newList);
 
 		for (int i = 1; i < cur->in.size(); i++)
 		{
@@ -54,8 +87,18 @@ void separateBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur,
 	}
 	else
 	{
-		newList->Add(cur->out[0]->data->Strings[0]);
-		cur->out[0]->data->Delete(0);
+		String currentStr;
+		do
+		{
+			currentStr = cur->in[0]->data->Strings[0];
+			newList->Add(currentStr);
+			cur->in[0]->data->Delete(0);
+		}
+		while(	currentStr != "#Move" &&
+				currentStr != "#PenColor" &&
+				currentStr != "#BrushColor" &&
+				currentStr != "#PenWidth" &&
+				cur->out[0]->data->Count > 0);
 		g->addNode(cur,newNode , cur->out[0]->end, newList, cur->out[0]->data);
 	}
 	cur = newNode;
@@ -75,15 +118,28 @@ void unionBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
 
 void undo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
 {
-
+	if (cur->in.size() == 0)
+	{
+        return;
+	}
 	if (cur->out.size() != 1)
 	{
 		separateBranch(g,cur);
 	}
 	else if (cur->in[0]->data->Count != 0)
 	{
-		cur->out[0]->data->Insert(0,cur->in[0]->data->Strings[cur->in[0]->data->Count - 1]);
-		cur->in[0]->data->Delete(cur->in[0]->data->Count - 1);
+        String currentStr;
+		do
+		{
+			currentStr = cur->in[0]->data->Strings[cur->in[0]->data->Count - 1];
+			cur->out[0]->data->Insert(0,currentStr);
+			cur->in[0]->data->Delete(cur->in[0]->data->Count - 1);
+		}
+		while(	currentStr != "#Move" &&
+				currentStr != "#PenColor" &&
+				currentStr != "#BrushColor" &&
+				currentStr != "#PenWidth" &&
+				cur->in[0]->data->Count > 0);
 	}
 	else
 	{
@@ -96,21 +152,27 @@ void undo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
                 break;
 			}
 		}
+
 		unionBranch(g,cur);
-		separateBranch(g,buf);
+		if (buf->in.size() != 0)
+		{
+            separateBranch(g,buf);
+		}
     }
 }
-
 
 TStringList* getCurLog(Node<TStringList*, int>* n)
 {
 	n->passed = true;
 	TStringList* result = new TStringList();
-	for (int i = n->in.size() - 1; i >= 0; i++)
+    TStringList* buf;
+	for (int i = n->in.size() - 1 ; i >= 0; i--)
 	{
 		if (!n->in[i]->start->passed)
 		{
-            result->AddStrings(getCurLog(n->in[i]->start));
+			buf = getCurLog(n->in[i]->start);
+			result->AddStrings(buf);
+            delete buf;
 		}
 		result->AddStrings(n->in[i]->data);
 	}
@@ -125,6 +187,13 @@ TStringList* getCurLog()
    return result;
 }
 
+void TForm1::clearImg()
+{
+    Image1->Canvas->Brush->Color	= clWhite;
+	Image1->Canvas->Pen->Color	= clWhite;
+   	Image1->Canvas->Rectangle(0,0, Image1->Width ,Image1->Height);
+
+}
 
 void TForm1::readLog(TStringList* imglog)
 {
@@ -222,18 +291,18 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 	{
 		pen = true;
 		((TImage*)Sender)->Canvas->MoveTo(X,Y);
-		imageLog->Add("#Move");
-		imageLog->Add(IntToStr(X));
-		imageLog->Add(IntToStr(Y));
+		curNode->in[0]->data->Add("#Move");
+		curNode->in[0]->data->Add(IntToStr(X));
+		curNode->in[0]->data->Add(IntToStr(Y));
 	}
 	if (sbLine->Down)
 	{
 		line = true;
 		((TImage*)Sender)->Canvas->MoveTo(X,Y);
-		imageLog->Add("#Move");
-		imageLog->Add(IntToStr(X));
-		imageLog->Add(IntToStr(Y));
-        buffer->Assign(Image1->Picture->Bitmap);
+        curNode->in[0]->data->Add("#Move");
+		curNode->in[0]->data->Add(IntToStr(X));
+		curNode->in[0]->data->Add(IntToStr(Y));
+		buffer->Assign(Image1->Picture->Bitmap);
 	}
 
 
@@ -245,9 +314,9 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 	if (pen)
 	{
 		((TImage*)Sender)->Canvas->LineTo(X,Y);
-		imageLog->Add("#Line");
-		imageLog->Add(IntToStr(X));
-		imageLog->Add(IntToStr(Y));
+		curNode->in[0]->data->Add("#Line");
+		curNode->in[0]->data->Add(IntToStr(X));
+		curNode->in[0]->data->Add(IntToStr(Y));
 	}
 	if (line)
 	{
@@ -262,11 +331,11 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 {
 	if (line)
 	{
-        imageLog->Add("#Line");
-		imageLog->Add(IntToStr(X));
-		imageLog->Add(IntToStr(Y));
+		curNode->in[0]->data->Add("#Line");
+		curNode->in[0]->data->Add(IntToStr(X));
+		curNode->in[0]->data->Add(IntToStr(Y));
 	}
-    line = false;
+	line = false;
 	pen = false;
 }
 //---------------------------------------------------------------------------
@@ -294,7 +363,7 @@ void __fastcall TForm1::Save2Click(TObject *Sender)
 
 void __fastcall TForm1::View1Click(TObject *Sender)
 {
-	Form2->Memo1->Lines = imageLog;
+	Form2->Memo1->Lines->SetStrings(getCurLog());
 	Form2->Show();
 }
 //---------------------------------------------------------------------------
@@ -303,9 +372,9 @@ void __fastcall TForm1::ColorBox1Change(TObject *Sender)
 {
 	if (!programingChange)
 	{
-        PenColor = ((TColorBox*)Sender)->Selected;
-		imageLog->Add("#PenColor");
-		imageLog->Add(IntToStr(((TColorBox*)Sender)->Selected));
+		PenColor = ((TColorBox*)Sender)->Selected;
+		curNode->in[0]->data->Add("#PenColor");
+		curNode->in[0]->data->Add(IntToStr(((TColorBox*)Sender)->Selected));
 	}
 
 
@@ -316,9 +385,9 @@ void __fastcall TForm1::ColorBox2Change(TObject *Sender)
 {
 	if (!programingChange)
 	{
-    	BrushColor = ((TColorBox*)Sender)->Selected;
-		imageLog->Add("#BrushColor");
-		imageLog->Add(IntToStr(((TColorBox*)Sender)->Selected));
+		BrushColor = ((TColorBox*)Sender)->Selected;
+		curNode->in[0]->data->Add("#BrushColor");
+		curNode->in[0]->data->Add(IntToStr(((TColorBox*)Sender)->Selected));
 	}
 
 }
@@ -328,11 +397,28 @@ void __fastcall TForm1::NumberBox1ChangeValue(TObject *Sender)
 {
 	if (!programingChange)
 	{
-        Image1->Canvas->Pen->Width = ((TNumberBox*)Sender)->Value;
-		imageLog->Add("#PenWidth");
-		imageLog->Add(IntToStr((int)((TNumberBox*)Sender)->Value));
+		Image1->Canvas->Pen->Width = ((TNumberBox*)Sender)->Value;
+		curNode->in[0]->data->Add("#PenWidth");
+		curNode->in[0]->data->Add(IntToStr((int)((TNumberBox*)Sender)->Value));
 	}
 
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Undo1Click(TObject *Sender)
+{
+	undo(history, curNode);
+	clearImg();
+    readLog(getCurLog());
+}
+//---------------------------------------------------------------------------
+
+
+
+void __fastcall TForm1::ree1Click(TObject *Sender)
+{
+	Tree->Memo1->Lines = GraphString(history);
+	Tree->Show();
 }
 //---------------------------------------------------------------------------
 

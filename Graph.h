@@ -143,9 +143,11 @@ inline void Graph<TBranch, TNode>::addNode(Node<TBranch, TNode>* previus, Node<T
 		}
 	}
 	Branch<TBranch, TNode >* b1 = new Branch<TBranch, TNode>(previus, newNode, bData1);
-	Branch<TBranch, TNode >* b2 = new Branch<TBranch, TNode>(newNode, next, bData1);
+	Branch<TBranch, TNode >* b2 = new Branch<TBranch, TNode>(newNode, next, bData2);
 	previus->out.push_back(b1);
+    newNode->in.push_back(b1);
 	next->in.push_back(b2);
+    newNode->out.push_back(b2);
 	branches.push_back(b1);
 	branches.push_back(b2);
 	nodes.push_back(newNode);

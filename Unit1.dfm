@@ -146,6 +146,14 @@ object Form1: TForm1
         OnClick = View1Click
       end
     end
+    object Undo1: TMenuItem
+      Caption = 'Undo'
+      OnClick = Undo1Click
+    end
+    object ree1: TMenuItem
+      Caption = 'Tree'
+      OnClick = ree1Click
+    end
   end
   object OpenDialog1: TOpenDialog
     Left = 200
