@@ -34,6 +34,12 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	Node <TStringList*, int>* start = new Node <TStringList*, int>(nodeCount++);
 	Node <TStringList*, int>* end = new Node <TStringList*, int>(nodeCount++);
 	TStringList* firstLog = new TStringList();
+    firstLog->Add("#PenColor");
+	firstLog->Add("0");
+	firstLog->Add("#BrushColor");
+	firstLog->Add("16777215");
+	firstLog->Add("#PenWidth");
+	firstLog->Add("1");
 	history->CreateGraph(start,end, firstLog);
 	curNode = end;
 }
@@ -87,12 +93,15 @@ void separateBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur,
 	}
 	else
 	{
-		String currentStr;
+		String currentStr = cur->out[0]->data->Strings[0];
 		do
 		{
-			currentStr = cur->in[0]->data->Strings[0];
 			newList->Add(currentStr);
-			cur->in[0]->data->Delete(0);
+			cur->out[0]->data->Delete(0);
+            if (cur->out[0]->data->Count > 0)
+			{
+				currentStr = cur->out[0]->data->Strings[0];
+			}
 		}
 		while(	currentStr != "#Move" &&
 				currentStr != "#PenColor" &&
@@ -105,15 +114,16 @@ void separateBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur,
 
 }
 
-void unionBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
+void unionBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur, bool setToStart = true)
 {
 	TStringList* newList = new TStringList();
 	newList->AddStrings(cur->in[0]->data);
 	newList->AddStrings(cur->out[0]->data);
-	Node<TStringList*, int>* buf = cur->in[0]->start;
-	g->addBranch(cur->in[0]->start, cur->out[0]->end, newList);
+	Node<TStringList*, int>* start = cur->in[0]->start;
+	Node<TStringList*, int>* end = cur->out[0]->end;
+	g->addBranch(start, end, newList);
 	g->removeNode(cur);
-    cur = buf;
+    cur = setToStart ? start : end;
 }
 
 void undo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
@@ -122,13 +132,13 @@ void undo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
 	{
         return;
 	}
-	if (cur->out.size() != 1)
+	if (cur->out.size() != 1 || cur->in.size() != 1)
 	{
 		separateBranch(g,cur);
 	}
 	else if (cur->in[0]->data->Count != 0)
 	{
-        String currentStr;
+		String currentStr;
 		do
 		{
 			currentStr = cur->in[0]->data->Strings[cur->in[0]->data->Count - 1];
@@ -143,7 +153,7 @@ void undo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
 	}
 	else
 	{
-    	Node<TStringList*, int>* buf = cur->in[0]->start;
+		Node<TStringList*, int>* buf = cur->in[0]->start;
 		for (int i = 1; i < cur->in.size(); i++)
 		{
 		   if (g->isAncestorOf(cur->in[0]->start,cur->in[i]->start))
@@ -159,6 +169,42 @@ void undo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
             separateBranch(g,buf);
 		}
     }
+}
+
+void redo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
+{
+	if (cur->out.size() == 0)
+	{
+        return;
+	}
+
+	if (cur->out.size() != 1 || cur->in.size() != 1)
+	{
+        separateBranch(g,cur,false);
+	}
+	else if (cur->out[0]->data->Count != 0)
+	{
+		String currentStr = cur->out[0]->data->Strings[0];
+
+		do
+		{
+			cur->in[0]->data->Add(currentStr);
+			cur->out[0]->data->Delete(0);
+			if (cur->out[0]->data->Count > 0)
+			{
+				currentStr = cur->out[0]->data->Strings[0];
+			}
+		}
+		while(	currentStr != "#Move" &&
+				currentStr != "#PenColor" &&
+				currentStr != "#BrushColor" &&
+				currentStr != "#PenWidth" &&
+				cur->out[0]->data->Count > 0);
+	}
+	else
+	{
+		unionBranch(g,cur,false);
+	}
 }
 
 TStringList* getCurLog(Node<TStringList*, int>* n)
@@ -405,20 +451,26 @@ void __fastcall TForm1::NumberBox1ChangeValue(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TForm1::Undo1Click(TObject *Sender)
-{
-	undo(history, curNode);
-	clearImg();
-    readLog(getCurLog());
-}
-//---------------------------------------------------------------------------
-
-
-
 void __fastcall TForm1::ree1Click(TObject *Sender)
 {
 	Tree->Memo1->Lines = GraphString(history);
 	Tree->Show();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Undo1Click(TObject *Sender)
+{
+	undo(history, curNode);
+	clearImg();
+	readLog(getCurLog());
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Redo1Click(TObject *Sender)
+{
+    redo(history, curNode);
+	clearImg();
+	readLog(getCurLog());
 }
 //---------------------------------------------------------------------------
 

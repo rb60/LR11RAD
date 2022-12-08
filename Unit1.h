@@ -37,8 +37,10 @@ __published:	// IDE-managed Components
 	TColorBox *ColorBox1;
 	TColorBox *ColorBox2;
 	TNumberBox *NumberBox1;
-	TMenuItem *Undo1;
+	TMenuItem *UndoRedo;
 	TMenuItem *ree1;
+	TMenuItem *Undo1;
+	TMenuItem *Redo1;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -50,12 +52,13 @@ __published:	// IDE-managed Components
 	void __fastcall ColorBox1Change(TObject *Sender);
 	void __fastcall ColorBox2Change(TObject *Sender);
 	void __fastcall NumberBox1ChangeValue(TObject *Sender);
-	void __fastcall Undo1Click(TObject *Sender);
 	void __fastcall ree1Click(TObject *Sender);
+	void __fastcall Undo1Click(TObject *Sender);
+	void __fastcall Redo1Click(TObject *Sender);
 
 private:	// User declarations
     void clearImg();
-    void readLog(TStringList* imglog);
+	void readLog(TStringList* imglog);
 	__property TColor PenColor = {read = getPenColor, write = setPenColor};
 	__property TColor BrushColor = {read = getBrushColor, write = setBrushColor};
 	__property int PenWidth = {read = getPenWidth, write = setPenWidth};

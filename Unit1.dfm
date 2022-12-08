@@ -146,9 +146,16 @@ object Form1: TForm1
         OnClick = View1Click
       end
     end
-    object Undo1: TMenuItem
-      Caption = 'Undo'
-      OnClick = Undo1Click
+    object UndoRedo: TMenuItem
+      Caption = 'UndoRedo'
+      object Undo1: TMenuItem
+        Caption = 'Undo'
+        OnClick = Undo1Click
+      end
+      object Redo1: TMenuItem
+        Caption = 'Redo'
+        OnClick = Redo1Click
+      end
     end
     object ree1: TMenuItem
       Caption = 'Tree'
