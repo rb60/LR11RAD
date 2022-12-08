@@ -50,7 +50,7 @@ TStringList* GraphString(Graph <TStringList*, int> *g)
    TStringList* result = new TStringList();
    for (int i = 0; i < g->nodes.size(); i++)
    {
-		result->Add("Node #" + IntToStr(g->nodes[i]->data));
+		result->Add((g->nodes[i] == curNode ? "CURNode#" : "Node#") + IntToStr(g->nodes[i]->data));
 		for (int j = 0; j < g->nodes[i]->out.size(); j++)
 		{
 			result->Add("\tConection to Node#" + IntToStr(g->nodes[i]->out[j]->end->data));
@@ -63,6 +63,17 @@ TStringList* GraphString(Graph <TStringList*, int> *g)
 
 }
 
+
+void createBranch()
+{
+	if (curNode->out.size() != 0)
+	{
+		Node <TStringList*, int> *newNode = new Node <TStringList*, int>(nodeCount++);
+		history->addNode(curNode, newNode, new TStringList());
+		curNode = newNode;
+
+	}
+}
 
 void separateBranch(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur, bool before = true)
 {
@@ -166,7 +177,8 @@ void undo(Graph <TStringList*, int> *g, Node<TStringList*, int>*& cur)
 		unionBranch(g,cur);
 		if (buf->in.size() != 0)
 		{
-            separateBranch(g,buf);
+			separateBranch(g,buf);
+            cur = buf;
 		}
     }
 }
@@ -337,6 +349,7 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 	{
 		pen = true;
 		((TImage*)Sender)->Canvas->MoveTo(X,Y);
+		createBranch();
 		curNode->in[0]->data->Add("#Move");
 		curNode->in[0]->data->Add(IntToStr(X));
 		curNode->in[0]->data->Add(IntToStr(Y));
@@ -345,6 +358,8 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 	{
 		line = true;
 		((TImage*)Sender)->Canvas->MoveTo(X,Y);
+		if (curNode->out.size() != 0)
+		createBranch();
         curNode->in[0]->data->Add("#Move");
 		curNode->in[0]->data->Add(IntToStr(X));
 		curNode->in[0]->data->Add(IntToStr(Y));
@@ -360,6 +375,14 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 	if (pen)
 	{
 		((TImage*)Sender)->Canvas->LineTo(X,Y);
+        if (curNode->out.size() != 0)
+		{
+			Node <TStringList*, int> *newNode = new Node <TStringList*, int>(nodeCount++);
+			history->addNode(curNode, newNode, new TStringList());
+            curNode = newNode;
+
+		}
+		createBranch();
 		curNode->in[0]->data->Add("#Line");
 		curNode->in[0]->data->Add(IntToStr(X));
 		curNode->in[0]->data->Add(IntToStr(Y));
@@ -377,6 +400,7 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 {
 	if (line)
 	{
+        createBranch();
 		curNode->in[0]->data->Add("#Line");
 		curNode->in[0]->data->Add(IntToStr(X));
 		curNode->in[0]->data->Add(IntToStr(Y));
@@ -419,6 +443,7 @@ void __fastcall TForm1::ColorBox1Change(TObject *Sender)
 	if (!programingChange)
 	{
 		PenColor = ((TColorBox*)Sender)->Selected;
+		createBranch();
 		curNode->in[0]->data->Add("#PenColor");
 		curNode->in[0]->data->Add(IntToStr(((TColorBox*)Sender)->Selected));
 	}
@@ -432,6 +457,7 @@ void __fastcall TForm1::ColorBox2Change(TObject *Sender)
 	if (!programingChange)
 	{
 		BrushColor = ((TColorBox*)Sender)->Selected;
+		createBranch();
 		curNode->in[0]->data->Add("#BrushColor");
 		curNode->in[0]->data->Add(IntToStr(((TColorBox*)Sender)->Selected));
 	}
@@ -444,6 +470,7 @@ void __fastcall TForm1::NumberBox1ChangeValue(TObject *Sender)
 	if (!programingChange)
 	{
 		Image1->Canvas->Pen->Width = ((TNumberBox*)Sender)->Value;
+        createBranch();
 		curNode->in[0]->data->Add("#PenWidth");
 		curNode->in[0]->data->Add(IntToStr((int)((TNumberBox*)Sender)->Value));
 	}

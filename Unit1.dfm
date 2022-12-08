@@ -129,8 +129,8 @@ object Form1: TForm1
     end
   end
   object MainMenu1: TMainMenu
-    Left = 416
-    Top = 144
+    Left = 288
+    Top = 136
     object Log1: TMenuItem
       Caption = 'Log'
       object Save1: TMenuItem
@@ -150,10 +150,12 @@ object Form1: TForm1
       Caption = 'UndoRedo'
       object Undo1: TMenuItem
         Caption = 'Undo'
+        ShortCut = 16474
         OnClick = Undo1Click
       end
       object Redo1: TMenuItem
         Caption = 'Redo'
+        ShortCut = 16473
         OnClick = Redo1Click
       end
     end
@@ -167,7 +169,7 @@ object Form1: TForm1
     Top = 136
   end
   object SaveDialog1: TSaveDialog
-    Left = 96
-    Top = 168
+    Left = 104
+    Top = 136
   end
 end
