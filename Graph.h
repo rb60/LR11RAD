@@ -33,6 +33,7 @@ template<typename TBranch, typename TNode>
 class Graph
 {
 public:
+	Graph();
 	void CreateGraph(Node<TBranch, TNode>* n1, Node<TBranch, TNode>* n2, TBranch b);
 	void addNode(	Node<TBranch, TNode>* addTo,
 					Node<TBranch, TNode>* newNode,
@@ -44,8 +45,11 @@ public:
 					TBranch bData1,
 					TBranch bData2);
 
+	void addBranch(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end, TBranch data);
 	void removeBranch(Branch<TBranch, TNode>* branch);
 	void removeNode(Node<TBranch, TNode>* node);
+	void setAllnotPassed();
+	bool isAncestorOf(Node<TBranch, TNode>* n1, Node<TBranch, TNode>* n2);
 	std::list<Node<TBranch, TNode>*> Path(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end);
 	std::vector<Branch<TBranch, TNode>*> branches;
 	std::vector<Node<TBranch, TNode>*> nodes;
@@ -78,7 +82,7 @@ inline Node<TBranch, TNode>::Node(TNode data)
 template<typename TBranch, typename TNode>
 inline void Node<TBranch, TNode>::removeBranch(Branch<TBranch, TNode>* branch)
 {
-	for (int i = 0; i < in.size; i++)
+	for (int i = 0; i < in.size(); i++)
 	{
 		if (in[i] == branch)
 		{
@@ -95,6 +99,12 @@ inline void Node<TBranch, TNode>::removeBranch(Branch<TBranch, TNode>* branch)
 			return;
 		}
 	}
+}
+
+template<typename TBranch, typename TNode>
+inline Graph<TBranch, TNode>::Graph()
+{
+
 }
 
 template<typename TBranch, typename TNode>
@@ -144,6 +154,15 @@ inline void Graph<TBranch, TNode>::addNode(Node<TBranch, TNode>* previus, Node<T
 }
 
 template<typename TBranch, typename TNode>
+inline void Graph<TBranch, TNode>::addBranch(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end, TBranch data)
+{
+	Branch<TBranch, TNode>* newBranch = new Branch<TBranch, TNode>(start, end, data);
+	start->out.push_back(newBranch);
+	end->in.push_back(newBranch);
+	branches.push_back(newBranch);
+}
+
+template<typename TBranch, typename TNode>
 inline void Graph<TBranch, TNode>::removeBranch(Branch<TBranch, TNode>* branch)
 {
 	branch->start->removeBranch(branch);
@@ -152,7 +171,7 @@ inline void Graph<TBranch, TNode>::removeBranch(Branch<TBranch, TNode>* branch)
 	{
 		if (branches[i] == branch)
 		{
-			branches.erase(branches.begin + i);
+			branches.erase(branches.begin() + i);
 		}
 	}
 }
@@ -174,10 +193,39 @@ inline void Graph<TBranch, TNode>::removeNode(Node<TBranch, TNode>* node)
 	{
 		if (nodes[i] == node)
 		{
-			nodes.erase(nodes.begin + i);
+			nodes.erase(nodes.begin() + i);
 			break;
 		}
 	}
+}
+
+template<typename TBranch, typename TNode>
+inline void Graph<TBranch, TNode>::setAllnotPassed()
+{
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		nodes[i]->passed = false;
+	}
+}
+
+template<typename TBranch, typename TNode>
+inline bool Graph<TBranch, TNode>::isAncestorOf(Node<TBranch, TNode>* n1, Node<TBranch, TNode>* n2)
+{
+	if (n1 == n2)
+	{
+		return true;
+	}
+	bool result = false;
+	n1->passed = true;
+	for (int i = 0; i < n1->out.size(); i++)
+	{
+		if (!n1->out[i]->end->passed && !result)
+		{
+			result = isAncestorOf(n1->out[i]->end, n2);
+		}
+	}
+	n1->passed = false;
+	return result;
 }
 
 template<typename TBranch, typename TNode>
