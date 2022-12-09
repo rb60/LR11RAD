@@ -23,8 +23,11 @@ object Form3: TForm3
       Top = 16
       Width = 145
       Height = 23
+      ItemIndex = 0
       TabOrder = 0
-      Text = 'ComboBox1'
+      Text = 'Merge'
+      Items.Strings = (
+        'Merge')
     end
     object ComboBox2: TComboBox
       Left = 233
@@ -32,23 +35,24 @@ object Form3: TForm3
       Width = 145
       Height = 23
       TabOrder = 1
-      Text = 'ComboBox2'
     end
     object Button1: TButton
       Left = 16
       Top = 56
       Width = 75
       Height = 25
-      Caption = 'Button1'
+      Caption = 'Update'
       TabOrder = 2
+      OnClick = Button1Click
     end
     object Button2: TButton
       Left = 104
       Top = 56
       Width = 75
       Height = 25
-      Caption = 'Button2'
+      Caption = 'Execute'
       TabOrder = 3
+      OnClick = Button2Click
     end
   end
   object Memo1: TMemo
@@ -57,11 +61,8 @@ object Form3: TForm3
     Width = 624
     Height = 344
     Align = alClient
+    ScrollBars = ssVertical
     TabOrder = 1
-    ExplicitLeft = 344
-    ExplicitTop = 296
-    ExplicitWidth = 185
-    ExplicitHeight = 89
   end
   object ComboBox3: TComboBox
     Left = 384
@@ -69,6 +70,5 @@ object Form3: TForm3
     Width = 145
     Height = 23
     TabOrder = 2
-    Text = 'ComboBox3'
   end
 end

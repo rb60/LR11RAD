@@ -158,6 +158,13 @@ inline void Graph<TBranch, TNode>::addNode(Node<TBranch, TNode>* previus, Node<T
 template<typename TBranch, typename TNode>
 inline void Graph<TBranch, TNode>::addBranch(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end, TBranch data)
 {
+	for (int i = 0; i < branches.size(); i++)
+	{
+		if (branches[i]->start == start && branches[i]->end == end)
+		{
+			return;
+		}
+	}
 	Branch<TBranch, TNode>* newBranch = new Branch<TBranch, TNode>(start, end, data);
 	start->out.push_back(newBranch);
 	end->in.push_back(newBranch);
@@ -181,12 +188,12 @@ inline void Graph<TBranch, TNode>::removeBranch(Branch<TBranch, TNode>* branch)
 template<typename TBranch, typename TNode>
 inline void Graph<TBranch, TNode>::removeNode(Node<TBranch, TNode>* node)
 {
-	for (int i = 0; i < node->in.size(); i++)
+	for (int i = node->in.size() - 1; i >= 0; i--)
 	{
 		removeBranch(node->in[i]);
 	}
 
-	for (int i = 0; i < node->out.size(); i++)
+	for (int i = node->out.size() - 1; i >= 0; i--)
 	{
 		removeBranch(node->out[i]);
 	}

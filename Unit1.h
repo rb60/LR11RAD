@@ -41,6 +41,7 @@ __published:	// IDE-managed Components
 	TMenuItem *ree1;
 	TMenuItem *Undo1;
 	TMenuItem *Redo1;
+	TMenuItem *Update1;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -55,6 +56,7 @@ __published:	// IDE-managed Components
 	void __fastcall ree1Click(TObject *Sender);
 	void __fastcall Undo1Click(TObject *Sender);
 	void __fastcall Redo1Click(TObject *Sender);
+	void __fastcall Update1Click(TObject *Sender);
 
 private:	// User declarations
     void clearImg();

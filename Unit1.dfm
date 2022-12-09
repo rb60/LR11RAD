@@ -163,6 +163,10 @@ object Form1: TForm1
       Caption = 'Tree'
       OnClick = ree1Click
     end
+    object Update1: TMenuItem
+      Caption = 'Update'
+      OnClick = Update1Click
+    end
   end
   object OpenDialog1: TOpenDialog
     Left = 200

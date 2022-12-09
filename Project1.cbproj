@@ -152,9 +152,13 @@
             <DependentOn>Unit3.h</DependentOn>
             <BuildOrder>5</BuildOrder>
         </CppCompile>
+        <CppCompile Include="Unit4.cpp">
+            <DependentOn>Unit4.h</DependentOn>
+            <BuildOrder>6</BuildOrder>
+        </CppCompile>
         <FormResources Include="Unit2.dfm"/>
-        <FormResources Include="Unit1.dfm"/>
         <FormResources Include="Unit3.dfm"/>
+        <FormResources Include="Unit1.dfm"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
