@@ -22,6 +22,7 @@ __published:	// IDE-managed Components
 	TButton *Button2;
 	void __fastcall Button1Click(TObject *Sender);
 	void __fastcall Button2Click(TObject *Sender);
+	void __fastcall ComboBox1Change(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
 	void update();

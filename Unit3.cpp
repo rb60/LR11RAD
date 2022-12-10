@@ -38,13 +38,12 @@ void __fastcall TForm3::Button2Click(TObject *Sender)
 	switch (ComboBox1->ItemIndex)
 	{
 	case 0:
-		if (g->nodes[ComboBox2->ItemIndex] != g->nodes[ComboBox3->ItemIndex])
-		{
-			merge(g,g->nodes[ComboBox2->ItemIndex],g->nodes[ComboBox3->ItemIndex]);
-			*cur = g->nodes[ComboBox3->ItemIndex];
-		}
-
-	break;
+		merge(g,g->nodes[ComboBox2->ItemIndex],g->nodes[ComboBox3->ItemIndex]);
+		*cur = g->nodes[ComboBox3->ItemIndex];
+		break;
+	case 1:
+		*cur = g->nodes[ComboBox2->ItemIndex];
+		break;
 
     default:
         ;
@@ -53,4 +52,19 @@ void __fastcall TForm3::Button2Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+
+void __fastcall TForm3::ComboBox1Change(TObject *Sender)
+{
+	if (((TComboBox*)Sender)->ItemIndex == 1)
+	{
+		ComboBox3->Visible = false;
+        ComboBox3->Enabled = false;
+	}
+	else
+	{
+		ComboBox3->Visible = true;
+        ComboBox3->Enabled = true;
+    }
+}
+//---------------------------------------------------------------------------
 

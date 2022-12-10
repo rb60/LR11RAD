@@ -48,6 +48,9 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#PenColor" &&
 			currentStr != "#BrushColor" &&
 			currentStr != "#PenWidth" &&
+			currentStr != "#Rect" &&
+            currentStr != "#PenStyle" &&
+			currentStr != "#BrushStyle" &&
 			cur->data.prev->data->Count > 0);
 }
 
@@ -67,6 +70,9 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#PenColor" &&
 			currentStr != "#BrushColor" &&
 			currentStr != "#PenWidth" &&
+			currentStr != "#Rect" &&
+			currentStr != "#PenStyle" &&
+			currentStr != "#BrushStyle" &&
 			cur->data.next->data->Count > 0);
 }
 
@@ -223,7 +229,11 @@ TStringList* getCurLog(Node<TStringList*, NodeData>* n)
 
 void merge(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeData>* cur, Node<TStringList*, NodeData>* end)
 {
-	g->addBranch(cur,end,new TStringList());
+	if (!g->isAncestorOf(end,cur))
+	{
+        g->addBranch(cur,end,new TStringList());
+	}
+
 }
 
 TStringList* getCurLog(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeData>* cur)

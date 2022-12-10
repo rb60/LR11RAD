@@ -18,6 +18,7 @@ ImgNode* curNode;
 bool programingChange = false;
 bool pen = false;
 bool line = false;
+bool rect = false;
 int imgx0, imgy0;
 TStringList* imageLog;
 TBitmap* buffer;
@@ -39,6 +40,10 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	firstLog->Add("16777215");
 	firstLog->Add("#PenWidth");
 	firstLog->Add("1");
+	firstLog->Add("#PenStyle");
+	firstLog->Add("0");
+	firstLog->Add("#BrushStyle");
+	firstLog->Add("0");
 	history->CreateGraph(start, curNode, firstLog);
 	start->data.next = start->out.back();
     curNode->data.prev = curNode->in.back();
@@ -53,6 +58,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 void TForm1::clearImg()
 {
 	Image1->Canvas->Brush->Color	= clWhite;
+    Image1->Canvas->Brush->Style	= bsSolid;
 	Image1->Canvas->Pen->Color	= clWhite;
 	Image1->Canvas->Rectangle(0,0, Image1->Width ,Image1->Height);
 
@@ -69,7 +75,6 @@ void TForm1::readLog(TStringList* imglog)
 			i++;
 			int y = StrToInt(imglog->Strings[i]);
 			Image1->Canvas->MoveTo(x,y);
-			continue;
 		}
 		else if (imglog->Strings[i] == "#Line")
 		{
@@ -78,30 +83,59 @@ void TForm1::readLog(TStringList* imglog)
 			i++;
 			int y = StrToInt(imglog->Strings[i]);
 			Image1->Canvas->LineTo(x,y);
-			continue;
 		}
 		else if (imglog->Strings[i] == "#PenColor")
 		{
 			i++;
 			TColor c = (TColor)StrToInt(imglog->Strings[i]);
 			PenColor = c;
-			continue;
 		}
 		else if (imglog->Strings[i] == "#BrushColor")
 		{
 			i++;
 			TColor c = (TColor)StrToInt(imglog->Strings[i]);
 			BrushColor = c;
-			continue;
 		}
 		else if (imglog->Strings[i] == "#PenWidth")
 		{
 			i++;
 			int w = StrToInt(imglog->Strings[i]);
 			PenWidth = w;
-			continue;
 		}
+		else if(imglog->Strings[i] == "#Rect")
+		{
+			int x1,y1,x2,y2;
+			i++;
+			x1 = StrToInt(imglog->Strings[i++]);
+			y1 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i]);
+			Image1->Canvas->Rectangle(x1,y1,x2,y2);
+		}
+		else if(imglog->Strings[i] == "#PenStyle")
+		{
+			i++;
+			TPenStyle s = (TPenStyle)StrToInt(imglog->Strings[i]);
+			PenStyle = s;
+		}
+        else if(imglog->Strings[i] == "#BrushStyle")
+		{
+			i++;
+			TBrushStyle s = (TBrushStyle)StrToInt(imglog->Strings[i]);
+			BrushStyle = s;
+        }
 	}
+}
+
+
+TBrushStyle TForm1::getBrushStyle()
+{
+	return Image1->Canvas->Brush->Style;
+}
+
+TPenStyle TForm1::getPenStyle()
+{
+    return Image1->Canvas->Pen->Style;
 }
 
 int TForm1::getPenWidth()
@@ -117,6 +151,22 @@ TColor TForm1::getPenColor()
 TColor TForm1::getBrushColor()
 {
 	return Image1->Canvas->Brush->Color;
+}
+
+void TForm1::setBrushStyle(TBrushStyle value)
+{
+	Image1->Canvas->Brush->Style = value;
+	programingChange = true;
+	ComboBox2->ItemIndex = (int)value;
+	programingChange = false;
+}
+
+void TForm1::setPenStyle(TPenStyle value)
+{
+	Image1->Canvas->Pen->Style = value;
+	programingChange = true;
+	ComboBox1->ItemIndex = (int)value;
+    programingChange = false;
 }
 
 void TForm1::setPenWidth(int value)
@@ -173,6 +223,11 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 		Form3->update();
 		buffer->Assign(Image1->Picture->Bitmap);
 	}
+	if (sbRect->Down)
+	{
+		rect = true;
+        buffer->Assign(Image1->Picture->Bitmap);
+	}
 
 
 }
@@ -196,6 +251,11 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 		((TImage*)Sender)->Canvas->MoveTo(imgx0,imgy0);
 		((TImage*)Sender)->Canvas->LineTo(X,Y);
 	}
+	if (rect)
+	{
+		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
+        ((TImage*)Sender)->Canvas->Rectangle(imgx0,imgy0,X,Y);
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShiftState Shift,
@@ -210,6 +270,18 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 		curNode->data.prev->data->Add(IntToStr(Y));
 		Form3->update();
 	}
+	if (rect)
+	{
+        if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Rect");
+		curNode->data.prev->data->Add(IntToStr(imgx0));
+		curNode->data.prev->data->Add(IntToStr(imgy0));
+		curNode->data.prev->data->Add(IntToStr(X));
+		curNode->data.prev->data->Add(IntToStr(Y));
+
+	}
+    rect = false;
 	line = false;
 	pen = false;
 }
@@ -319,6 +391,34 @@ void __fastcall TForm1::Update1Click(TObject *Sender)
     clearImg();
 	readLog(getCurLog(history,curNode));
 	Form3->update();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::ComboBox1Change(TObject *Sender)
+{
+	if (!programingChange)
+	{
+		PenStyle = (TPenStyle)((TComboBox*)Sender)->ItemIndex;
+		if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#PenStyle");
+		curNode->data.prev->data->Add(IntToStr(((TComboBox*)Sender)->ItemIndex));
+		Form3->update();
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::ComboBox2Change(TObject *Sender)
+{
+    if (!programingChange)
+	{
+		BrushStyle = (TBrushStyle)((TComboBox*)Sender)->ItemIndex;
+		if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#BrushStyle");
+		curNode->data.prev->data->Add(IntToStr(((TComboBox*)Sender)->ItemIndex));
+		Form3->update();
+	}
 }
 //---------------------------------------------------------------------------
 

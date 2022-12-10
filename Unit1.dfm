@@ -34,6 +34,7 @@ object Form1: TForm1
     Height = 65
     Align = alTop
     TabOrder = 0
+    ExplicitTop = -6
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -50,12 +51,13 @@ object Form1: TForm1
       GroupIndex = 1
       Caption = '/'
     end
-    object SpeedButton3: TSpeedButton
+    object sbRect: TSpeedButton
       Left = 86
       Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
+      Caption = '[]'
     end
     object SpeedButton4: TSpeedButton
       Left = 125
@@ -86,46 +88,82 @@ object Form1: TForm1
       GroupIndex = 1
     end
     object Shape1: TShape
-      Left = 428
-      Top = 19
+      Left = 340
+      Top = 9
       Width = 40
-      Height = 40
+      Height = 50
       Brush.Color = clBlack
     end
     object Shape2: TShape
-      Left = 474
-      Top = 19
+      Left = 386
+      Top = 9
       Width = 40
-      Height = 40
+      Height = 51
     end
     object ColorBox1: TColorBox
-      Left = 520
-      Top = 8
-      Width = 145
+      Left = 432
+      Top = 9
+      Width = 105
       Height = 22
       TabOrder = 0
       OnChange = ColorBox1Change
     end
     object ColorBox2: TColorBox
-      Left = 520
-      Top = 36
-      Width = 145
+      Left = 432
+      Top = 37
+      Width = 105
       Height = 22
       Selected = clWhite
       TabOrder = 1
       OnChange = ColorBox2Change
     end
     object NumberBox1: TNumberBox
-      Left = 373
-      Top = 22
+      Left = 281
+      Top = 9
       Width = 49
-      Height = 23
+      Height = 22
       MinValue = 1.000000000000000000
       MaxValue = 5.000000000000000000
       TabOrder = 2
       Value = 1.000000000000000000
       SpinButtonOptions.Placement = nbspCompact
       OnChangeValue = NumberBox1ChangeValue
+    end
+    object ComboBox1: TComboBox
+      Left = 543
+      Top = 9
+      Width = 145
+      Height = 23
+      ItemIndex = 0
+      TabOrder = 3
+      Text = 'Solid'
+      OnChange = ComboBox1Change
+      Items.Strings = (
+        'Solid'
+        'Dash'
+        'Dot'
+        'DashDot'
+        'DashDotDot'
+        'Clear')
+    end
+    object ComboBox2: TComboBox
+      Left = 543
+      Top = 38
+      Width = 145
+      Height = 23
+      ItemIndex = 0
+      TabOrder = 4
+      Text = 'Solid'
+      OnChange = ComboBox2Change
+      Items.Strings = (
+        'Solid'
+        'Clear'
+        'Horizontal'
+        'Vertical'
+        'FDiagonal'
+        'BDiagonal'
+        'Cross'
+        'DiagCross')
     end
   end
   object MainMenu1: TMainMenu

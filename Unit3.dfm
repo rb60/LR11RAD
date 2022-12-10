@@ -23,11 +23,12 @@ object Form3: TForm3
       Top = 16
       Width = 145
       Height = 23
-      ItemIndex = 0
       TabOrder = 0
       Text = 'Merge'
+      OnChange = ComboBox1Change
       Items.Strings = (
-        'Merge')
+        'Merge'
+        'Set current Node')
     end
     object ComboBox2: TComboBox
       Left = 233
