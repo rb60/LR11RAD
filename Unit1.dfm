@@ -34,6 +34,8 @@ object Form1: TForm1
     Height = 81
     Align = alTop
     TabOrder = 0
+    ExplicitLeft = -16
+    ExplicitTop = -16
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -59,8 +61,8 @@ object Form1: TForm1
       Caption = '[]'
     end
     object sbText: TSpeedButton
-      Left = 125
-      Top = 8
+      Left = 164
+      Top = 9
       Width = 33
       Height = 33
       GroupIndex = 1
@@ -72,19 +74,21 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
     end
-    object SpeedButton5: TSpeedButton
-      Left = 164
-      Top = 8
+    object sbElipse: TSpeedButton
+      Left = 125
+      Top = 9
       Width = 33
       Height = 33
       GroupIndex = 1
+      Caption = 'O'
     end
-    object SpeedButton6: TSpeedButton
+    object sbPip: TSpeedButton
       Left = 203
       Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
+      Caption = 'P'
     end
     object SpeedButton7: TSpeedButton
       Left = 242
@@ -107,8 +111,8 @@ object Form1: TForm1
       Height = 51
     end
     object SpeedButton1: TSpeedButton
-      Left = 125
-      Top = 47
+      Left = 164
+      Top = 48
       Width = 33
       Height = 22
       Caption = 'FONT'

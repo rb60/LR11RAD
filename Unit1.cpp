@@ -20,6 +20,7 @@ bool pen = false;
 bool line = false;
 bool rect = false;
 bool text = false;
+bool elipse = false;
 int imgx0, imgy0;
 TStringList* imageLog;
 TStringList* initialLog;
@@ -37,15 +38,25 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	curNode = new ImgNode({1, nullptr, nullptr});
 	initialLog = new TStringList();
 	initialLog->Add("#PenColor");
-	initialLog->Add("0");
+	initialLog->Add("0x00000000");
 	initialLog->Add("#BrushColor");
-	initialLog->Add("16777215");
+	initialLog->Add("0x00FFFFFF");
 	initialLog->Add("#PenWidth");
 	initialLog->Add("1");
 	initialLog->Add("#PenStyle");
 	initialLog->Add("0");
 	initialLog->Add("#BrushStyle");
 	initialLog->Add("0");
+	initialLog->Add("#Font");
+	initialLog->Add("Times New Roman");
+	initialLog->Add("12");
+	initialLog->Add("0x00000000");
+	initialLog->Add("0");
+	initialLog->Add("0");
+	initialLog->Add("0");
+	initialLog->Add("0");
+    readLog(initialLog);
+
 	history->CreateGraph(start, curNode, new TStringList());
 	start->data.next = start->out.back();
     curNode->data.prev = curNode->in.back();
@@ -137,14 +148,26 @@ void TForm1::readLog(TStringList* imglog)
         else if(imglog->Strings[i] == "#Font")
 		{
 			i++;
-			Font->Name = imglog->Strings[i++];
-			Font->Size = StrToInt(imglog->Strings[i++]);
-			Font->Color = (TColor)StrToInt(imglog->Strings[i++]);
-			Font->Style = TFontStyles();
-			if (imglog->Strings[i++] == "-1") Font->Style = Font->Style << fsBold;
-			if (imglog->Strings[i++] == "-1") Font->Style = Font->Style << fsItalic;
-			if (imglog->Strings[i++] == "-1") Font->Style = Font->Style << fsUnderline;
-			if (imglog->Strings[i]   == "-1") Font->Style = Font->Style << fsStrikeOut;
+            TFont* newFont = new TFont();
+			newFont->Name = imglog->Strings[i++];
+			newFont->Size = StrToInt(imglog->Strings[i++]);
+			newFont->Color = (TColor)StrToInt(imglog->Strings[i++]);
+			newFont->Style = TFontStyles();
+			if (imglog->Strings[i++] == "-1") newFont->Style = Font->Style << fsBold;
+			if (imglog->Strings[i++] == "-1") newFont->Style = Font->Style << fsItalic;
+			if (imglog->Strings[i++] == "-1") newFont->Style = Font->Style << fsUnderline;
+			if (imglog->Strings[i]   == "-1") newFont->Style = Font->Style << fsStrikeOut;
+            Font = newFont;
+		}
+        else if(imglog->Strings[i] == "#Ellipse")
+		{
+			int x1,y1,x2,y2;
+			i++;
+			x1 = StrToInt(imglog->Strings[i++]);
+			y1 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i]);
+			Image1->Canvas->Ellipse(x1,y1,x2,y2);
 		}
 	}
 }
@@ -271,6 +294,11 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
         Edit1->SetFocus();
 
 	}
+	if (sbElipse->Down)
+	{
+		elipse = true;
+        buffer->Assign(Image1->Picture->Bitmap);
+	}
 
 
 }
@@ -292,12 +320,45 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 	{
 		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
 		((TImage*)Sender)->Canvas->MoveTo(imgx0,imgy0);
-		((TImage*)Sender)->Canvas->LineTo(X,Y);
+		if (Shift.Contains(ssShift))
+		{
+			((TImage*)Sender)->Canvas->LineTo(	abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0,
+												abs(X - imgx0) > abs(Y - imgy0) ? imgy0 : Y);
+		}
+		else
+		{
+			((TImage*)Sender)->Canvas->LineTo(X,Y);
+		}
+
 	}
 	if (rect)
 	{
 		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
-        ((TImage*)Sender)->Canvas->Rectangle(imgx0,imgy0,X,Y);
+		if (Shift.Contains(ssShift))
+		{
+			((TImage*)Sender)->Canvas->Rectangle(imgx0,imgy0,
+												 abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0 + (Y - imgy0),
+												 abs(X - imgx0) > abs(Y - imgy0) ? imgy0 + (X - imgx0) : Y);
+		}
+		else
+		{
+			((TImage*)Sender)->Canvas->Rectangle(imgx0,imgy0,X,Y);
+		}
+
+	}
+	if (elipse)
+	{
+		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
+		if (Shift.Contains(ssShift))
+		{
+			((TImage*)Sender)->Canvas->Ellipse(imgx0,imgy0,
+												 abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0 + (Y - imgy0),
+												 abs(X - imgx0) > abs(Y - imgy0) ? imgy0 + (X - imgx0) : Y);
+		}
+		else
+		{
+			((TImage*)Sender)->Canvas->Ellipse(imgx0,imgy0,X,Y);
+		}
 	}
 }
 //---------------------------------------------------------------------------
@@ -324,9 +385,20 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 		curNode->data.prev->data->Add(IntToStr(Y));
 
 	}
+	if (elipse)
+	{
+        if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Ellipse");
+		curNode->data.prev->data->Add(IntToStr(imgx0));
+		curNode->data.prev->data->Add(IntToStr(imgy0));
+		curNode->data.prev->data->Add(IntToStr(X));
+		curNode->data.prev->data->Add(IntToStr(Y));
+	}
     rect = false;
 	line = false;
 	pen = false;
+    elipse = false;
 }
 //---------------------------------------------------------------------------
 
@@ -368,7 +440,7 @@ void __fastcall TForm1::ColorBox1Change(TObject *Sender)
 		if (curNode->out.size() != 0)
 			createBranch(history,curNode);
 		curNode->data.prev->data->Add("#PenColor");
-		curNode->data.prev->data->Add(IntToStr(((TColorBox*)Sender)->Selected));
+		curNode->data.prev->data->Add("0x" + IntToHex(((TColorBox*)Sender)->Selected));
 		Form3->update();
 	}
 
@@ -384,7 +456,7 @@ void __fastcall TForm1::ColorBox2Change(TObject *Sender)
 		if (curNode->out.size() != 0)
 			createBranch(history,curNode);
 		curNode->data.prev->data->Add("#BrushColor");
-		curNode->data.prev->data->Add(IntToStr(((TColorBox*)Sender)->Selected));
+		curNode->data.prev->data->Add("0x" + IntToHex(((TColorBox*)Sender)->Selected));
 		Form3->update();
 	}
 
@@ -489,6 +561,7 @@ void __fastcall TForm1::Edit1KeyPress(TObject *Sender, System::WideChar &Key)
 		curNode->data.prev->data->Add(IntToStr(imgy0));
 		curNode->data.prev->data->Add(((TEdit*)Sender)->Text);
 	}
+	((TEdit*)Sender)->Width = Image1->Canvas->TextWidth(((TEdit*)Sender)->Text + "###");
 }
 //---------------------------------------------------------------------------
 
@@ -521,7 +594,7 @@ void __fastcall TForm1::SpeedButton1Click(TObject *Sender)
 		curNode->data.prev->data->Add("#Font");
 		curNode->data.prev->data->Add(Font->Name);
 		curNode->data.prev->data->Add(IntToStr(Font->Size));
-		curNode->data.prev->data->Add(IntToStr((int)Font->Color));
+		curNode->data.prev->data->Add("0x" + IntToHex((int)Font->Color));
 		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsBold)));
 		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsItalic)));
 		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsUnderline)));

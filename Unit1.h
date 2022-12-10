@@ -22,8 +22,8 @@ __published:	// IDE-managed Components
 	TSpeedButton *sbLine;
 	TSpeedButton *sbRect;
 	TSpeedButton *sbText;
-	TSpeedButton *SpeedButton5;
-	TSpeedButton *SpeedButton6;
+	TSpeedButton *sbElipse;
+	TSpeedButton *sbPip;
 	TSpeedButton *SpeedButton7;
 	TMainMenu *MainMenu1;
 	TMenuItem *Log1;
