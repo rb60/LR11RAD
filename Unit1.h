@@ -21,7 +21,7 @@ __published:	// IDE-managed Components
 	TSpeedButton *sbPencil;
 	TSpeedButton *sbLine;
 	TSpeedButton *sbRect;
-	TSpeedButton *SpeedButton4;
+	TSpeedButton *sbText;
 	TSpeedButton *SpeedButton5;
 	TSpeedButton *SpeedButton6;
 	TSpeedButton *SpeedButton7;
@@ -44,6 +44,9 @@ __published:	// IDE-managed Components
 	TMenuItem *Update1;
 	TComboBox *ComboBox1;
 	TComboBox *ComboBox2;
+	TEdit *Edit1;
+	TFontDialog *FontDialog1;
+	TSpeedButton *SpeedButton1;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -61,22 +64,28 @@ __published:	// IDE-managed Components
 	void __fastcall Update1Click(TObject *Sender);
 	void __fastcall ComboBox1Change(TObject *Sender);
 	void __fastcall ComboBox2Change(TObject *Sender);
+	void __fastcall Edit1KeyPress(TObject *Sender, System::WideChar &Key);
+	void __fastcall Edit1Exit(TObject *Sender);
+	void __fastcall Edit2Enter(TObject *Sender);
+	void __fastcall SpeedButton1Click(TObject *Sender);
 
 private:	// User declarations
     void clearImg();
 	void readLog(TStringList* imglog);
 
-
+	__property TFont Font = {read = getFont, write = setFont};
 	__property TBrushStyle BrushStyle = {read = getBrushStyle, write = setBrushStyle};
 	__property TPenStyle PenStyle = {read = getPenStyle, write = setPenStyle};
 	__property TColor PenColor = {read = getPenColor, write = setPenColor};
 	__property TColor BrushColor = {read = getBrushColor, write = setBrushColor};
 	__property int PenWidth = {read = getPenWidth, write = setPenWidth};
+    TFont* getFont();
 	TBrushStyle getBrushStyle();
 	TPenStyle getPenStyle();
 	int getPenWidth();
 	TColor getPenColor();
 	TColor getBrushColor();
+    void setFont(TFont* value);
 	void setBrushStyle(TBrushStyle value);
 	void setPenStyle(TPenStyle value);
 	void setPenWidth(int value);

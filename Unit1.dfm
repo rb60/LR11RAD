@@ -15,9 +15,9 @@ object Form1: TForm1
   TextHeight = 15
   object Image1: TImage
     Left = 0
-    Top = 65
+    Top = 81
     Width = 748
-    Height = 376
+    Height = 360
     Align = alClient
     OnMouseDown = Image1MouseDown
     OnMouseMove = Image1MouseMove
@@ -31,10 +31,9 @@ object Form1: TForm1
     Left = 0
     Top = 0
     Width = 748
-    Height = 65
+    Height = 81
     Align = alTop
     TabOrder = 0
-    ExplicitTop = -6
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -59,12 +58,19 @@ object Form1: TForm1
       GroupIndex = 1
       Caption = '[]'
     end
-    object SpeedButton4: TSpeedButton
+    object sbText: TSpeedButton
       Left = 125
       Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
+      Caption = 'T'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
     end
     object SpeedButton5: TSpeedButton
       Left = 164
@@ -99,6 +105,20 @@ object Form1: TForm1
       Top = 9
       Width = 40
       Height = 51
+    end
+    object SpeedButton1: TSpeedButton
+      Left = 125
+      Top = 47
+      Width = 33
+      Height = 22
+      Caption = 'FONT'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -9
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+      OnClick = SpeedButton1Click
     end
     object ColorBox1: TColorBox
       Left = 432
@@ -166,9 +186,20 @@ object Form1: TForm1
         'DiagCross')
     end
   end
+  object Edit1: TEdit
+    Left = 362
+    Top = 232
+    Width = 121
+    Height = 23
+    Enabled = False
+    TabOrder = 1
+    Visible = False
+    OnExit = Edit1Exit
+    OnKeyPress = Edit1KeyPress
+  end
   object MainMenu1: TMainMenu
     Left = 288
-    Top = 136
+    Top = 224
     object Log1: TMenuItem
       Caption = 'Log'
       object Save1: TMenuItem
@@ -208,10 +239,19 @@ object Form1: TForm1
   end
   object OpenDialog1: TOpenDialog
     Left = 200
-    Top = 136
+    Top = 224
   end
   object SaveDialog1: TSaveDialog
     Left = 104
-    Top = 136
+    Top = 224
+  end
+  object FontDialog1: TFontDialog
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    Left = 496
+    Top = 232
   end
 end

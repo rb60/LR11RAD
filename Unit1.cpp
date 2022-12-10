@@ -19,8 +19,10 @@ bool programingChange = false;
 bool pen = false;
 bool line = false;
 bool rect = false;
+bool text = false;
 int imgx0, imgy0;
 TStringList* imageLog;
+TStringList* initialLog;
 TBitmap* buffer;
 
 //---------------------------------------------------------------------------
@@ -33,18 +35,18 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	history = new Graph<TStringList*, NodeData>();
 	ImgNode* start = new ImgNode({0, nullptr, nullptr});
 	curNode = new ImgNode({1, nullptr, nullptr});
-	TStringList* firstLog = new TStringList();
-    firstLog->Add("#PenColor");
-	firstLog->Add("0");
-	firstLog->Add("#BrushColor");
-	firstLog->Add("16777215");
-	firstLog->Add("#PenWidth");
-	firstLog->Add("1");
-	firstLog->Add("#PenStyle");
-	firstLog->Add("0");
-	firstLog->Add("#BrushStyle");
-	firstLog->Add("0");
-	history->CreateGraph(start, curNode, firstLog);
+	initialLog = new TStringList();
+	initialLog->Add("#PenColor");
+	initialLog->Add("0");
+	initialLog->Add("#BrushColor");
+	initialLog->Add("16777215");
+	initialLog->Add("#PenWidth");
+	initialLog->Add("1");
+	initialLog->Add("#PenStyle");
+	initialLog->Add("0");
+	initialLog->Add("#BrushStyle");
+	initialLog->Add("0");
+	history->CreateGraph(start, curNode, new TStringList());
 	start->data.next = start->out.back();
     curNode->data.prev = curNode->in.back();
 
@@ -123,10 +125,34 @@ void TForm1::readLog(TStringList* imglog)
 			i++;
 			TBrushStyle s = (TBrushStyle)StrToInt(imglog->Strings[i]);
 			BrushStyle = s;
-        }
+		}
+        else if(imglog->Strings[i] == "#Text")
+		{
+            int x,y;
+			i++;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i++]);
+			Image1->Canvas->TextOut(x,y,imglog->Strings[i]);
+		}
+        else if(imglog->Strings[i] == "#Font")
+		{
+			i++;
+			Font->Name = imglog->Strings[i++];
+			Font->Size = StrToInt(imglog->Strings[i++]);
+			Font->Color = (TColor)StrToInt(imglog->Strings[i++]);
+			Font->Style = TFontStyles();
+			if (imglog->Strings[i++] == "-1") Font->Style = Font->Style << fsBold;
+			if (imglog->Strings[i++] == "-1") Font->Style = Font->Style << fsItalic;
+			if (imglog->Strings[i++] == "-1") Font->Style = Font->Style << fsUnderline;
+			if (imglog->Strings[i]   == "-1") Font->Style = Font->Style << fsStrikeOut;
+		}
 	}
 }
 
+TFont* TForm1::getFont()
+{
+    return Image1->Canvas->Font;
+}
 
 TBrushStyle TForm1::getBrushStyle()
 {
@@ -151,6 +177,12 @@ TColor TForm1::getPenColor()
 TColor TForm1::getBrushColor()
 {
 	return Image1->Canvas->Brush->Color;
+}
+
+void TForm1::setFont(TFont* value)
+{
+	Image1->Canvas->Font = value;
+    Edit1->Font = value;
 }
 
 void TForm1::setBrushStyle(TBrushStyle value)
@@ -227,6 +259,17 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 	{
 		rect = true;
         buffer->Assign(Image1->Picture->Bitmap);
+	}
+	if (sbText->Down)
+	{
+        Edit1->Text = "";
+		text = true;
+		Edit1->Top = Y + Panel1->Height;
+		Edit1->Left = X;
+		Edit1->Enabled = true;
+		Edit1->Visible = true;
+        Edit1->SetFocus();
+
 	}
 
 
@@ -310,7 +353,9 @@ void __fastcall TForm1::Save2Click(TObject *Sender)
 
 void __fastcall TForm1::View1Click(TObject *Sender)
 {
-	Form2->Memo1->Lines->SetStrings(getCurLog(history,curNode));
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	Form2->Memo1->Lines->SetStrings(imageLog);
 	Form2->Show();
 }
 //---------------------------------------------------------------------------
@@ -372,7 +417,9 @@ void __fastcall TForm1::Undo1Click(TObject *Sender)
 {
 	undo(history, curNode);
 	clearImg();
-	readLog(getCurLog(history,curNode));
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	readLog(imageLog);
 	Form3->update();
 }
 //---------------------------------------------------------------------------
@@ -381,15 +428,19 @@ void __fastcall TForm1::Redo1Click(TObject *Sender)
 {
 	redo(history, curNode);
 	clearImg();
-	readLog(getCurLog(history,curNode));
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	readLog(imageLog);
 	Form3->update();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::Update1Click(TObject *Sender)
 {
-    clearImg();
-	readLog(getCurLog(history,curNode));
+	clearImg();
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	readLog(imageLog);
 	Form3->update();
 }
 //---------------------------------------------------------------------------
@@ -418,6 +469,64 @@ void __fastcall TForm1::ComboBox2Change(TObject *Sender)
 		curNode->data.prev->data->Add("#BrushStyle");
 		curNode->data.prev->data->Add(IntToStr(((TComboBox*)Sender)->ItemIndex));
 		Form3->update();
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Edit1KeyPress(TObject *Sender, System::WideChar &Key)
+{
+	if (Key == vkReturn)
+	{
+		text = false;
+		Form1->SetFocus();
+		((TEdit*)Sender)->Visible = false;
+		((TEdit*)Sender)->Enabled = false;
+		Image1->Canvas->TextOut(imgx0,imgy0,((TEdit*)Sender)->Text);
+		if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Text");
+		curNode->data.prev->data->Add(IntToStr(imgx0));
+		curNode->data.prev->data->Add(IntToStr(imgy0));
+		curNode->data.prev->data->Add(((TEdit*)Sender)->Text);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Edit1Exit(TObject *Sender)
+{
+	if (text)
+	{
+        ((TEdit*)Sender)->SetFocus();
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Edit2Enter(TObject *Sender)
+{
+	if (FontDialog1->Execute() == mrOk)
+	{
+		((TEdit*)Sender)->Text = FontDialog1->Font->Name;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::SpeedButton1Click(TObject *Sender)
+{
+	FontDialog1->Font = Font;
+	if (FontDialog1->Execute() == mrOk)
+	{
+		Font = FontDialog1->Font;
+		if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Font");
+		curNode->data.prev->data->Add(Font->Name);
+		curNode->data.prev->data->Add(IntToStr(Font->Size));
+		curNode->data.prev->data->Add(IntToStr((int)Font->Color));
+		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsBold)));
+		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsItalic)));
+		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsUnderline)));
+		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsStrikeOut)));
+
 	}
 }
 //---------------------------------------------------------------------------

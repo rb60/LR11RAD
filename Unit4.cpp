@@ -4,7 +4,6 @@
 
 #include "Unit4.h"
 //---------------------------------------------------------------------------
-int nodeCount = 2;
 TStringList* GraphString(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeData>* cur)
 {
 	TStringList* result = new TStringList();
@@ -28,7 +27,7 @@ TStringList* GraphString(Graph <TStringList*, NodeData> *g, Node<TStringList*, N
 void createBranch(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeData>*& cur)
 {
 
-	Node <TStringList*, NodeData> *newNode = new Node <TStringList*, NodeData>({nodeCount++, nullptr, nullptr});
+	Node <TStringList*, NodeData> *newNode = new Node <TStringList*, NodeData>({(int)g->nodes.size(), nullptr, nullptr});
 	g->addNode(cur, newNode, new TStringList());
     newNode->data.prev = newNode->in[0];
 	cur = newNode;
@@ -49,8 +48,10 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#BrushColor" &&
 			currentStr != "#PenWidth" &&
 			currentStr != "#Rect" &&
-            currentStr != "#PenStyle" &&
+			currentStr != "#PenStyle" &&
 			currentStr != "#BrushStyle" &&
+			currentStr != "#Text" &&
+            currentStr != "#Font" &&
 			cur->data.prev->data->Count > 0);
 }
 
@@ -73,6 +74,8 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Rect" &&
 			currentStr != "#PenStyle" &&
 			currentStr != "#BrushStyle" &&
+			currentStr != "#Text" &&
+			currentStr != "#Font" &&
 			cur->data.next->data->Count > 0);
 }
 
@@ -80,7 +83,7 @@ void separateBranch(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeDa
 {
 
 	TStringList* newList = new TStringList();
-	Node<TStringList*, NodeData> *newNode = new Node <TStringList*, NodeData>({nodeCount++, nullptr, nullptr});
+	Node<TStringList*, NodeData> *newNode = new Node <TStringList*, NodeData>({(int)g->nodes.size(), nullptr, nullptr});
 	if (before)
 	{
 		g->addNode(cur->data.prev->start ,newNode , cur, cur->data.prev->data, newList);
@@ -201,13 +204,17 @@ TStringList* getCurLog(Node<TStringList*, NodeData>* n)
 	TStringList* buf;
 	for (int i = n->in.size() - 1 ; i >= 0; i--)
 	{
-		if (!n->in[i]->start->passed && n->in[i] != n->data.prev)
+		if (n->in[i]->start	!= n->data.prev->start)
 		{
-			buf = getCurLog(n->in[i]->start);
-			result->AddStrings(buf);
-			delete buf;
+			if (!n->in[i]->start->passed)
+			{
+				buf = getCurLog(n->in[i]->start);
+				result->AddStrings(buf);
+				delete buf;
+			}
+			result->AddStrings(n->in[i]->data);
 		}
-		result->AddStrings(n->in[i]->data);
+
 	}
 
 	if (n->data.prev != nullptr)
