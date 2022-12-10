@@ -54,6 +54,7 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Font" &&
 			currentStr != "#Ellipse" &&
 			currentStr != "#Pipette" &&
+            currentStr != "#EraseStart" &&
 			cur->data.prev->data->Count > 0);
 }
 
@@ -79,7 +80,8 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Text" &&
 			currentStr != "#Font" &&
 			currentStr != "#Ellipse" &&
-            currentStr != "#Pipette" &&
+			currentStr != "#Pipette" &&
+			currentStr != "#EraseStart" &&
 			cur->data.next->data->Count > 0);
 }
 
@@ -110,7 +112,7 @@ void separateBranch(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeDa
 		g->addNode(cur,newNode , cur->data.next->end, newList, cur->data.next->data);
         newNode->data.prev = newNode->in[0];
 		newNode->data.next = newNode->out[0];
-        cur->data.next->end->data.prev = cur->data.next->end->out.back();
+        cur->data.next->end->data.prev = cur->data.next->end->in.back();
         cur->data.next = cur->out.back();
 		moveForward(newNode);
 	}

@@ -90,12 +90,13 @@ object Form1: TForm1
       GroupIndex = 1
       Caption = 'P'
     end
-    object SpeedButton7: TSpeedButton
+    object sbErase: TSpeedButton
       Left = 242
       Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
+      Caption = 'ERS'
     end
     object Shape1: TShape
       Left = 340

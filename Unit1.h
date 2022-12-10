@@ -24,7 +24,7 @@ __published:	// IDE-managed Components
 	TSpeedButton *sbText;
 	TSpeedButton *sbElipse;
 	TSpeedButton *sbPip;
-	TSpeedButton *SpeedButton7;
+	TSpeedButton *sbErase;
 	TMainMenu *MainMenu1;
 	TMenuItem *Log1;
 	TMenuItem *Save1;
@@ -66,7 +66,6 @@ __published:	// IDE-managed Components
 	void __fastcall ComboBox2Change(TObject *Sender);
 	void __fastcall Edit1KeyPress(TObject *Sender, System::WideChar &Key);
 	void __fastcall Edit1Exit(TObject *Sender);
-	void __fastcall Edit2Enter(TObject *Sender);
 	void __fastcall SpeedButton1Click(TObject *Sender);
 	void __fastcall Shape1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);

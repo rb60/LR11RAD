@@ -21,6 +21,7 @@ bool line = false;
 bool rect = false;
 bool text = false;
 bool elipse = false;
+bool erase = false;
 bool penColorSelected = true;
 int imgx0, imgy0;
 TStringList* imageLog;
@@ -183,9 +184,32 @@ void TForm1::readLog(TStringList* imglog)
 			}
 			else
 			{
-                BrushColor = c;
+				BrushColor = c;
             }
 		}
+		else if(imglog->Strings[i] == "#EraseStart" || imglog->Strings[i] == "#Erase")
+		{
+            if(imglog->Strings[i] == "#EraseStart")
+			{
+				Image1->Canvas->Pen->Color = clWhite;
+				Image1->Canvas->Brush->Color = clWhite;
+				Image1->Canvas->Brush->Style = bsSolid;
+			}
+			int x,y;
+			i++;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i++]);
+			Image1->Canvas->Rectangle(x - PenWidth*5, y - PenWidth*5, x + PenWidth*5, y + PenWidth*5);
+
+		}
+		else if(imglog->Strings[i] == "#EraseEnd")
+		{
+			Image1->Canvas->Pen->Color = Shape1->Brush->Color;
+			Image1->Canvas->Brush->Color = Shape2->Brush->Color;
+			Image1->Canvas->Brush->Style = (TBrushStyle)ComboBox2->ItemIndex;
+        }
+
+
 	}
 }
 
@@ -321,24 +345,30 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 		if (penColorSelected)
 		{
 			PenColor = Image1->Canvas->Pixels[X][Y];
-            if (curNode->out.size() != 0)
-				createBranch(history,curNode);
-			curNode->data.prev->data->Add("#Pipette");
-            curNode->data.prev->data->Add(IntToStr(X));
-            curNode->data.prev->data->Add(IntToStr(Y));
-			curNode->data.prev->data->Add("Pen");
-
 		}
 		else
 		{
 			BrushColor = Image1->Canvas->Pixels[X][Y];
-             if (curNode->out.size() != 0)
-				createBranch(history,curNode);
-			curNode->data.prev->data->Add("#Pipette");
-            curNode->data.prev->data->Add(IntToStr(X));
-            curNode->data.prev->data->Add(IntToStr(Y));
-			curNode->data.prev->data->Add("Brush");
-        }
+		}
+		if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Pipette");
+		curNode->data.prev->data->Add(IntToStr(X));
+		curNode->data.prev->data->Add(IntToStr(Y));
+		curNode->data.prev->data->Add(penColorSelected ? "Pen" : "Brush");
+	}
+	if (sbErase->Down)
+	{
+		erase = true;
+		if (curNode->out.size() != 0)
+            createBranch(history,curNode);
+		curNode->data.prev->data->Add("#EraseStart");
+		curNode->data.prev->data->Add(IntToStr(X));
+        curNode->data.prev->data->Add(IntToStr(Y));
+		Image1->Canvas->Pen->Color = clWhite;
+		Image1->Canvas->Brush->Color = clWhite;
+		Image1->Canvas->Brush->Style = bsSolid;
+		Image1->Canvas->Rectangle(X - PenWidth*5, Y - PenWidth*5, X + PenWidth*5, Y + PenWidth*5);
 	}
 
 
@@ -355,7 +385,6 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 		curNode->data.prev->data->Add("#Line");
 		curNode->data.prev->data->Add(IntToStr(X));
 		curNode->data.prev->data->Add(IntToStr(Y));
-		Form3->update();
 	}
 	if (line)
 	{
@@ -401,6 +430,15 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 			((TImage*)Sender)->Canvas->Ellipse(imgx0,imgy0,X,Y);
 		}
 	}
+	if (erase)
+	{
+		if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Erase");
+		curNode->data.prev->data->Add(IntToStr(X));
+        curNode->data.prev->data->Add(IntToStr(Y));
+		Image1->Canvas->Rectangle(X - PenWidth*5, Y - PenWidth*5, X + PenWidth*5, Y + PenWidth*5);
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShiftState Shift,
@@ -436,10 +474,21 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 		curNode->data.prev->data->Add(IntToStr(X));
 		curNode->data.prev->data->Add(IntToStr(Y));
 	}
+	if (erase)
+	{
+        if (curNode->out.size() != 0)
+            createBranch(history,curNode);
+		curNode->data.prev->data->Add("#EraseEnd");
+		Image1->Canvas->Pen->Color = Shape1->Brush->Color;
+		Image1->Canvas->Brush->Color = Shape2->Brush->Color;
+		Image1->Canvas->Brush->Style = (TBrushStyle)ComboBox2->ItemIndex;
+	}
+    Form3->update();
     rect = false;
 	line = false;
 	pen = false;
-    elipse = false;
+	elipse = false;
+    erase = false;
 }
 //---------------------------------------------------------------------------
 
@@ -472,6 +521,45 @@ void __fastcall TForm1::View1Click(TObject *Sender)
 	Form2->Show();
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TForm1::ree1Click(TObject *Sender)
+{
+	Form3->update();
+	Form3->Show();
+}
+
+void __fastcall TForm1::Undo1Click(TObject *Sender)
+{
+	undo(history, curNode);
+	clearImg();
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	readLog(imageLog);
+	Form3->update();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Redo1Click(TObject *Sender)
+{
+	redo(history, curNode);
+	clearImg();
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	readLog(imageLog);
+	Form3->update();
+}
+
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm1::Update1Click(TObject *Sender)
+{
+	clearImg();
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	readLog(imageLog);
+	Form3->update();
+}
 
 void __fastcall TForm1::ColorBox1Change(TObject *Sender)
 {
@@ -519,45 +607,7 @@ void __fastcall TForm1::NumberBox1ChangeValue(TObject *Sender)
 	}
 
 }
-//---------------------------------------------------------------------------
 
-void __fastcall TForm1::ree1Click(TObject *Sender)
-{
-	Form3->update();
-	Form3->Show();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm1::Undo1Click(TObject *Sender)
-{
-	undo(history, curNode);
-	clearImg();
-	imageLog->SetStrings(initialLog);
-	imageLog->AddStrings(getCurLog(history,curNode));
-	readLog(imageLog);
-	Form3->update();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm1::Redo1Click(TObject *Sender)
-{
-	redo(history, curNode);
-	clearImg();
-	imageLog->SetStrings(initialLog);
-	imageLog->AddStrings(getCurLog(history,curNode));
-	readLog(imageLog);
-	Form3->update();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm1::Update1Click(TObject *Sender)
-{
-	clearImg();
-	imageLog->SetStrings(initialLog);
-	imageLog->AddStrings(getCurLog(history,curNode));
-	readLog(imageLog);
-	Form3->update();
-}
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::ComboBox1Change(TObject *Sender)
@@ -613,15 +663,6 @@ void __fastcall TForm1::Edit1Exit(TObject *Sender)
 	if (text)
 	{
         ((TEdit*)Sender)->SetFocus();
-	}
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm1::Edit2Enter(TObject *Sender)
-{
-	if (FontDialog1->Execute() == mrOk)
-	{
-		((TEdit*)Sender)->Text = FontDialog1->Font->Name;
 	}
 }
 //---------------------------------------------------------------------------
