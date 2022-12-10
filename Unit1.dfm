@@ -103,12 +103,14 @@ object Form1: TForm1
       Width = 40
       Height = 50
       Brush.Color = clBlack
+      OnMouseDown = Shape1MouseDown
     end
     object Shape2: TShape
       Left = 386
       Top = 9
       Width = 40
       Height = 51
+      OnMouseDown = Shape2MouseDown
     end
     object SpeedButton1: TSpeedButton
       Left = 164

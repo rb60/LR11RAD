@@ -68,6 +68,13 @@ __published:	// IDE-managed Components
 	void __fastcall Edit1Exit(TObject *Sender);
 	void __fastcall Edit2Enter(TObject *Sender);
 	void __fastcall SpeedButton1Click(TObject *Sender);
+	void __fastcall Shape1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
+          int X, int Y);
+	void __fastcall Shape2MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
+          int X, int Y);
+
+
+
 
 private:	// User declarations
     void clearImg();

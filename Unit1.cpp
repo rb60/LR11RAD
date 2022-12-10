@@ -21,6 +21,7 @@ bool line = false;
 bool rect = false;
 bool text = false;
 bool elipse = false;
+bool penColorSelected = true;
 int imgx0, imgy0;
 TStringList* imageLog;
 TStringList* initialLog;
@@ -169,6 +170,22 @@ void TForm1::readLog(TStringList* imglog)
 			y2 = StrToInt(imglog->Strings[i]);
 			Image1->Canvas->Ellipse(x1,y1,x2,y2);
 		}
+        else if(imglog->Strings[i] == "#Pipette")
+		{
+			int x,y;
+			i++;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i++]);
+			TColor c = Image1->Canvas->Pixels[x][y];
+			if (imglog->Strings[i] == "Pen")
+			{
+                PenColor = c;
+			}
+			else
+			{
+                BrushColor = c;
+            }
+		}
 	}
 }
 
@@ -298,6 +315,30 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 	{
 		elipse = true;
         buffer->Assign(Image1->Picture->Bitmap);
+	}
+	if (sbPip->Down)
+	{
+		if (penColorSelected)
+		{
+			PenColor = Image1->Canvas->Pixels[X][Y];
+            if (curNode->out.size() != 0)
+				createBranch(history,curNode);
+			curNode->data.prev->data->Add("#Pipette");
+            curNode->data.prev->data->Add(IntToStr(X));
+            curNode->data.prev->data->Add(IntToStr(Y));
+			curNode->data.prev->data->Add("Pen");
+
+		}
+		else
+		{
+			BrushColor = Image1->Canvas->Pixels[X][Y];
+             if (curNode->out.size() != 0)
+				createBranch(history,curNode);
+			curNode->data.prev->data->Add("#Pipette");
+            curNode->data.prev->data->Add(IntToStr(X));
+            curNode->data.prev->data->Add(IntToStr(Y));
+			curNode->data.prev->data->Add("Brush");
+        }
 	}
 
 
@@ -442,6 +483,7 @@ void __fastcall TForm1::ColorBox1Change(TObject *Sender)
 		curNode->data.prev->data->Add("#PenColor");
 		curNode->data.prev->data->Add("0x" + IntToHex(((TColorBox*)Sender)->Selected));
 		Form3->update();
+		penColorSelected = true;
 	}
 
 
@@ -458,6 +500,7 @@ void __fastcall TForm1::ColorBox2Change(TObject *Sender)
 		curNode->data.prev->data->Add("#BrushColor");
 		curNode->data.prev->data->Add("0x" + IntToHex(((TColorBox*)Sender)->Selected));
 		Form3->update();
+        penColorSelected = false;
 	}
 
 }
@@ -601,6 +644,21 @@ void __fastcall TForm1::SpeedButton1Click(TObject *Sender)
 		curNode->data.prev->data->Add(BoolToStr(Font->Style.Contains(fsStrikeOut)));
 
 	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Shape1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
+          int X, int Y)
+{
+    penColorSelected = true;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm1::Shape2MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
+          int X, int Y)
+{
+    penColorSelected = false;
 }
 //---------------------------------------------------------------------------
 

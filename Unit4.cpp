@@ -52,7 +52,8 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#BrushStyle" &&
 			currentStr != "#Text" &&
 			currentStr != "#Font" &&
-            currentStr != "#Ellipse" &&
+			currentStr != "#Ellipse" &&
+			currentStr != "#Pipette" &&
 			cur->data.prev->data->Count > 0);
 }
 
@@ -77,7 +78,8 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#BrushStyle" &&
 			currentStr != "#Text" &&
 			currentStr != "#Font" &&
-            currentStr != "#Ellipse" &&
+			currentStr != "#Ellipse" &&
+            currentStr != "#Pipette" &&
 			cur->data.next->data->Count > 0);
 }
 
