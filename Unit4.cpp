@@ -174,13 +174,22 @@ void createBranch(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeData
 void moveBackward(Node<TStringList*, NodeData>* cur)
 {
 	String currentStr;
+    bool parametric = false;
 	do
 	{
 		currentStr = cur->data.prev->data->Strings[cur->data.prev->data->Count - 1];
 		cur->data.next->data->Insert(0,currentStr);
 		cur->data.prev->data->Delete(cur->data.prev->data->Count - 1);
+		if (currentStr == "#ParametricEnd")
+		{
+            parametric = true;
+		}
+
+
 	}
-	while(	currentStr != "#Move" &&
+	while(  (parametric ?
+				currentStr != "#ParametricStart" :
+			(currentStr != "#Move" &&
 			currentStr != "#PenColor" &&
 			currentStr != "#BrushColor" &&
 			currentStr != "#PenWidth" &&
@@ -193,23 +202,37 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Pipette" &&
 			currentStr != "#EraseStart" &&
 			currentStr != "#Clear" &&
-			currentStr != "#Rotate" &&
+			currentStr != "#Rotate")) &&
 			cur->data.prev->data->Count > 0);
 }
 
 void moveForward(Node<TStringList*, NodeData>* cur)
 {
 	String currentStr = cur->data.next->data->Strings[0];
+    bool parametric = false;
 	do
 	{
 		cur->data.prev->data->Add(currentStr);
 		cur->data.next->data->Delete(0);
+		if (currentStr == "#ParametricStart")
+		{
+            parametric = true;
+		}
+
+		if (currentStr == "#ParametricEnd")
+		{
+            parametric = false;
+		}
+
 		if (cur->data.next->data->Count > 0)
 		{
 			currentStr = cur->data.next->data->Strings[0];
 		}
 	}
-	while(	currentStr != "#Move" &&
+	while(  (parametric ?
+				true :
+			(currentStr != "#ParametricStart" &&
+			currentStr != "#Move" &&
 			currentStr != "#PenColor" &&
 			currentStr != "#BrushColor" &&
 			currentStr != "#PenWidth" &&
@@ -222,7 +245,7 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Pipette" &&
 			currentStr != "#EraseStart" &&
 			currentStr != "#Clear" &&
-            currentStr != "#Rotate" &&
+			currentStr != "#Rotate")) &&
 			cur->data.next->data->Count > 0);
 }
 
@@ -385,7 +408,8 @@ TStringList* getCurLog(Node<TStringList*, NodeData>* n)
 
 void merge(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeData>* cur, Node<TStringList*, NodeData>* end)
 {
-	if (!g->isAncestorOf(end,cur))
+	if (!g->isAncestorOf(end,cur) &&
+		!g->isAncestorOf(cur,end))
 	{
         g->addBranch(cur,end,new TStringList());
 	}

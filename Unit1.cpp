@@ -25,8 +25,10 @@ bool text = false;
 bool elipse = false;
 bool erase = false;
 bool penColorSelected = true;
+bool parametric = false;
 int imgx0, imgy0;
 TStringList* imageLog;
+TStringList* parametricLog;
 TStringList* initialLog;
 TBitmap* buffer;
 
@@ -35,6 +37,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
 	imageLog = new TStringList();
+	parametricLog = new TStringList();
 	buffer = new TBitmap();
 
 	history = new Graph<TStringList*, NodeData>();
@@ -71,6 +74,148 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+void TForm1::findMinMax(int& minx, int& maxx, int& miny, int& maxy, TStringList* imglog)
+{
+	minx = miny = maxx = maxy = -1;
+	for (int i = 0; i < imglog->Count; i++)
+	{
+		if (imglog->Strings[i] == "#Move")
+		{
+			i++;
+			int x = StrToInt(imglog->Strings[i]);
+			i++;
+			int y = StrToInt(imglog->Strings[i]);
+			if (x < minx || minx == -1) minx = x;
+			if (x > maxx || maxx == -1) maxx = x;
+			if (y < miny || miny == -1) miny = y;
+			if (y > maxy || maxy == -1) maxy = y;
+		}
+		else if (imglog->Strings[i] == "#Line")
+		{
+			i++;
+			int x = StrToInt(imglog->Strings[i]);
+			i++;
+			int y = StrToInt(imglog->Strings[i]);
+			if (x < minx || minx == -1) minx = x;
+			if (x > maxx || maxx == -1) maxx = x;
+			if (y < miny || miny == -1) miny = y;
+			if (y > maxy || maxy == -1) maxy = y;
+		}
+		else if(imglog->Strings[i] == "#Rect")
+		{
+			int x1,y1,x2,y2;
+			i++;
+			x1 = StrToInt(imglog->Strings[i++]);
+			y1 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i]);
+			if (x1 < minx || minx == -1) minx = x1;
+			if (x1 > maxx || maxx == -1) maxx = x1;
+			if (y1 < miny || miny == -1) miny = y1;
+			if (y1 > maxy || maxy == -1) maxy = y1;
+
+			if (x2 < minx || minx == -1) minx = x2;
+			if (x2 > maxx || maxx == -1) maxx = x2;
+			if (y2 < miny || miny == -1) miny = y2;
+			if (y2 > maxy || maxy == -1) maxy = y2;
+		}
+        else if(imglog->Strings[i] == "#Ellipse")
+		{
+			int x1,y1,x2,y2;
+			i++;
+			x1 = StrToInt(imglog->Strings[i++]);
+			y1 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i]);
+			if (x1 < minx || minx == -1) minx = x1;
+			if (x1 > maxx || maxx == -1) maxx = x1;
+			if (y1 < miny || miny == -1) miny = y1;
+			if (y1 > maxy || maxy == -1) maxy = y1;
+
+			if (x2 < minx || minx == -1) minx = x2;
+			if (x2 > maxx || maxx == -1) maxx = x2;
+			if (y2 < miny || miny == -1) miny = y2;
+			if (y2 > maxy || maxy == -1) maxy = y2;
+		}
+		else if(imglog->Strings[i] == "#EraseStart" || imglog->Strings[i] == "#Erase")
+		{
+			int x,y;
+			i++;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i++]);
+			Image1->Canvas->Rectangle(x - PenWidth*5, y - PenWidth*5, x + PenWidth*5, y + PenWidth*5);
+            if (x < minx || minx == -1) minx = x;
+			if (x > maxx || maxx == -1) maxx = x;
+			if (y < miny || miny == -1) miny = y;
+			if (y > maxy || maxy == -1) maxy = y;
+
+		}
+	}
+}
+
+TStringList* TForm1::toParametric(TStringList* imglog)
+{
+	int minx, maxx, miny, maxy;
+	findMinMax(minx, maxx, miny, maxy, imglog);
+	TStringList* result = new TStringList;
+	result->Add(IntToStr(maxx - minx));
+	result->Add(IntToStr(maxy - miny));
+	for (int i = 0; i < imglog->Count; i++)
+	{
+		if (imglog->Strings[i] == "#Move" ||
+            imglog->Strings[i] == "#Line" ||
+			imglog->Strings[i] == "#EraseStart" ||
+			imglog->Strings[i] == "#Erase")
+		{
+			result->Add(imglog->Strings[i++]);
+			int x = StrToInt(imglog->Strings[i++]);
+			int y = StrToInt(imglog->Strings[i]);
+			result->Add(IntToStr(x - minx));
+			result->Add(IntToStr(y - miny));
+		}
+		else if (	imglog->Strings[i] == "#PenColor" ||
+					imglog->Strings[i] == "#BrushColor" ||
+					imglog->Strings[i] == "#PenWidth" ||
+					imglog->Strings[i] == "#PenStyle" ||
+					imglog->Strings[i] == "#BrushStyle")
+		{
+			result->Add(imglog->Strings[i++]);
+            result->Add(imglog->Strings[i]);
+		}
+		else if(imglog->Strings[i] == "#Rect" ||
+				imglog->Strings[i] == "#Ellipse")
+		{
+            result->Add(imglog->Strings[i++]);
+			int x1,y1,x2,y2;
+			x1 = StrToInt(imglog->Strings[i++]);
+			y1 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i]);
+			result->Add(IntToStr(x1 - minx));
+			result->Add(IntToStr(y1 - miny));
+			result->Add(IntToStr(x2 - minx));
+			result->Add(IntToStr(y2 - miny));
+		}
+		else if(imglog->Strings[i] == "#Pipette")
+		{
+			result->Add(imglog->Strings[i++]);
+			int x,y;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i++]);
+            result->Add(IntToStr(x - minx));
+			result->Add(IntToStr(y - miny));
+			result->Add(imglog->Strings[i]);
+
+		}
+		else if(imglog->Strings[i] == "#EraseEnd")
+		{
+			result->Add(imglog->Strings[i++]);
+		}
+	}
+	result->Add("#ParametricEnd");
+    return result;
+}
+
 void TForm1::update()
 {
 	clearImg();
@@ -94,41 +239,76 @@ void TForm1::clearImg()
 
 void TForm1::readLog(TStringList* imglog)
 {
+	int pX0, pY0, pPenWidth;
+	float pDx, pDy;
+	TColor pBrushColor, pPenColor;
+	TPenStyle pPenStyle;
+	TBrushStyle pBrushStyle;
+	bool parametricLog = false;
 	for (int i = 0; i < imglog->Count; i++)
 	{
 		if (imglog->Strings[i] == "#Move")
 		{
 			i++;
-			int x = StrToInt(imglog->Strings[i]);
-			i++;
+			int x = StrToInt(imglog->Strings[i++]);
 			int y = StrToInt(imglog->Strings[i]);
+			if (parametricLog)
+			{
+				x = pX0 + pDx*x;
+				y = pY0 + pDy*y;
+            }
 			Image1->Canvas->MoveTo(x,y);
 		}
 		else if (imglog->Strings[i] == "#Line")
 		{
 			i++;
-			int x = StrToInt(imglog->Strings[i]);
-			i++;
+			int x = StrToInt(imglog->Strings[i++]);
 			int y = StrToInt(imglog->Strings[i]);
+			if (parametricLog)
+			{
+				x = pX0 + pDx*x;
+				y = pY0 + pDy*y;
+            }
 			Image1->Canvas->LineTo(x,y);
 		}
 		else if (imglog->Strings[i] == "#PenColor")
 		{
 			i++;
 			TColor c = (TColor)StrToInt(imglog->Strings[i]);
-			PenColor = c;
+			if (parametricLog)
+			{
+                Image1->Canvas->Pen->Color = c;
+			}
+			else
+			{
+                PenColor = c;
+            }
 		}
 		else if (imglog->Strings[i] == "#BrushColor")
 		{
 			i++;
 			TColor c = (TColor)StrToInt(imglog->Strings[i]);
-			BrushColor = c;
+			if (parametricLog)
+			{
+				Image1->Canvas->Brush->Color = c;
+			}
+			else
+			{
+                BrushColor = c;
+            }
 		}
 		else if (imglog->Strings[i] == "#PenWidth")
 		{
 			i++;
 			int w = StrToInt(imglog->Strings[i]);
-			PenWidth = w;
+			if (parametricLog)
+			{
+				Image1->Canvas->Pen->Width = w * min(pDx,pDy);
+			}
+			else
+			{
+                PenWidth = w;
+            }
 		}
 		else if(imglog->Strings[i] == "#Rect")
 		{
@@ -138,19 +318,40 @@ void TForm1::readLog(TStringList* imglog)
 			y1 = StrToInt(imglog->Strings[i++]);
 			x2 = StrToInt(imglog->Strings[i++]);
 			y2 = StrToInt(imglog->Strings[i]);
+			if (parametricLog)
+			{
+				x1 = pX0 + pDx*x1;
+				y1 = pY0 + pDy*y1;
+				x2 = pX0 + pDx*x2;
+				y2 = pY0 + pDy*y2;
+            }
 			Image1->Canvas->Rectangle(x1,y1,x2,y2);
 		}
 		else if(imglog->Strings[i] == "#PenStyle")
 		{
 			i++;
 			TPenStyle s = (TPenStyle)StrToInt(imglog->Strings[i]);
-			PenStyle = s;
+			if (parametricLog)
+			{
+				Image1->Canvas->Pen->Style = s;
+			}
+			else
+			{
+                PenStyle = s;
+            }
 		}
         else if(imglog->Strings[i] == "#BrushStyle")
 		{
 			i++;
 			TBrushStyle s = (TBrushStyle)StrToInt(imglog->Strings[i]);
-			BrushStyle = s;
+			if (parametricLog)
+			{
+                Image1->Canvas->Brush->Style = s;
+			}
+			else
+			{
+				BrushStyle = s;
+            }
 		}
         else if(imglog->Strings[i] == "#Text")
 		{
@@ -182,6 +383,13 @@ void TForm1::readLog(TStringList* imglog)
 			y1 = StrToInt(imglog->Strings[i++]);
 			x2 = StrToInt(imglog->Strings[i++]);
 			y2 = StrToInt(imglog->Strings[i]);
+			if (parametricLog)
+			{
+				x1 = pX0 + pDx*x1;
+				y1 = pY0 + pDy*y1;
+				x2 = pX0 + pDx*x2;
+				y2 = pY0 + pDy*y2;
+			}
 			Image1->Canvas->Ellipse(x1,y1,x2,y2);
 		}
         else if(imglog->Strings[i] == "#Pipette")
@@ -190,19 +398,38 @@ void TForm1::readLog(TStringList* imglog)
 			i++;
 			x = StrToInt(imglog->Strings[i++]);
 			y = StrToInt(imglog->Strings[i++]);
+			if (parametricLog)
+			{
+				x = pX0 + pDx*x;
+				y = pY0 + pDy*y;
+			}
 			TColor c = Image1->Canvas->Pixels[x][y];
 			if (imglog->Strings[i] == "Pen")
 			{
-                PenColor = c;
+				if (parametricLog)
+				{
+                    Image1->Canvas->Pen->Color = c;
+				}
+				else
+				{
+					PenColor = c;
+				}
 			}
 			else
 			{
-				BrushColor = c;
-            }
+                if (parametricLog)
+				{
+					Image1->Canvas->Brush->Color = c;
+				}
+				else
+				{
+					BrushColor = c;
+				}
+			}
 		}
 		else if(imglog->Strings[i] == "#EraseStart" || imglog->Strings[i] == "#Erase")
 		{
-            if(imglog->Strings[i] == "#EraseStart")
+			if(imglog->Strings[i] == "#EraseStart")
 			{
 				Image1->Canvas->Pen->Color = clWhite;
 				Image1->Canvas->Brush->Color = clWhite;
@@ -212,6 +439,11 @@ void TForm1::readLog(TStringList* imglog)
 			i++;
 			x = StrToInt(imglog->Strings[i++]);
 			y = StrToInt(imglog->Strings[i++]);
+			if (parametricLog)
+			{
+				x = pX0 + pDx*x;
+				y = pY0 + pDy*y;
+			}
 			Image1->Canvas->Rectangle(x - PenWidth*5, y - PenWidth*5, x + PenWidth*5, y + PenWidth*5);
 
 		}
@@ -230,10 +462,36 @@ void TForm1::readLog(TStringList* imglog)
 			int angle = StrToInt(imglog->Strings[++i]);
             rotate(angle);
 		}
+		else if (imglog->Strings[i] == "#ParametricStart")
+		{
+			int x2, y2, W, H;
+			i++;
+			pX0 = StrToInt(imglog->Strings[i++]);
+			pY0 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i++]);
+			W  = StrToInt(imglog->Strings[i++]);
+			H  = StrToInt(imglog->Strings[i]);
+			pDx = (x2 - pX0)/(float)W;
+			pDy = (y2 - pY0)/(float)H;
+			parametricLog = true;
+			pPenWidth = PenWidth;
+			pPenColor = PenColor;
+			pPenStyle = PenStyle;
+			pBrushColor = BrushColor;
+			pBrushStyle = BrushStyle;
+		}
+		else if (imglog->Strings[i] == "#ParametricEnd")
+		{
+			parametricLog = false;
+			PenWidth = pPenWidth;
+			PenColor = pPenColor;
+			PenStyle = pPenStyle;
+			BrushColor = pBrushColor;
+			BrushStyle = pBrushStyle;
+		}
 	}
 }
-
-
 
 void TForm1::rotate(int angle)
 {
@@ -439,6 +697,11 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 		Image1->Canvas->Brush->Style = bsSolid;
 		Image1->Canvas->Rectangle(X - PenWidth*5, Y - PenWidth*5, X + PenWidth*5, Y + PenWidth*5);
 	}
+	if (sbParametric->Down)
+	{
+		parametric = true;
+		buffer->Assign(Image1->Picture->Bitmap);
+	}
 
 
 }
@@ -508,6 +771,18 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
         curNode->data.prev->data->Add(IntToStr(Y));
 		Image1->Canvas->Rectangle(X - PenWidth*5, Y - PenWidth*5, X + PenWidth*5, Y + PenWidth*5);
 	}
+	if (parametric)
+	{
+		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
+		imageLog->Clear();
+		imageLog->Add("#ParametricStart");
+		imageLog->Add(IntToStr(imgx0));
+		imageLog->Add(IntToStr(imgy0));
+		imageLog->Add(IntToStr(X));
+		imageLog->Add(IntToStr(Y));
+		imageLog->AddStrings(parametricLog);
+		readLog(imageLog);
+	}
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShiftState Shift,
@@ -515,33 +790,72 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 {
 	if (line)
 	{
+        ((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
 		if (curNode->out.size() != 0)
 			createBranch(history,curNode);
 		curNode->data.prev->data->Add("#Line");
-		curNode->data.prev->data->Add(IntToStr(X));
-		curNode->data.prev->data->Add(IntToStr(Y));
-		Form3->update();
+        ((TImage*)Sender)->Canvas->MoveTo(imgx0,imgy0);
+        if (Shift.Contains(ssShift))
+		{
+			curNode->data.prev->data->Add(IntToStr(abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0));
+			curNode->data.prev->data->Add(IntToStr(abs(X - imgx0) > abs(Y - imgy0) ? imgy0 : Y));
+            ((TImage*)Sender)->Canvas->LineTo(	abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0,
+												abs(X - imgx0) > abs(Y - imgy0) ? imgy0 : Y);
+		}
+		else
+		{
+			curNode->data.prev->data->Add(IntToStr(X));
+			curNode->data.prev->data->Add(IntToStr(Y));
+            ((TImage*)Sender)->Canvas->LineTo(X,Y);
+		}
 	}
 	if (rect)
 	{
+    	((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
         if (curNode->out.size() != 0)
 			createBranch(history,curNode);
 		curNode->data.prev->data->Add("#Rect");
 		curNode->data.prev->data->Add(IntToStr(imgx0));
 		curNode->data.prev->data->Add(IntToStr(imgy0));
-		curNode->data.prev->data->Add(IntToStr(X));
-		curNode->data.prev->data->Add(IntToStr(Y));
+		if (Shift.Contains(ssShift))
+		{
+            curNode->data.prev->data->Add(IntToStr(abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0 + (Y - imgy0)));
+			curNode->data.prev->data->Add(IntToStr(abs(X - imgx0) > abs(Y - imgy0) ? imgy0 + (X - imgx0) : Y));
+			((TImage*)Sender)->Canvas->Rectangle(imgx0,imgy0,
+												 abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0 + (Y - imgy0),
+												 abs(X - imgx0) > abs(Y - imgy0) ? imgy0 + (X - imgx0) : Y);
+		}
+		else
+		{
+			curNode->data.prev->data->Add(IntToStr(X));
+			curNode->data.prev->data->Add(IntToStr(Y));
+            ((TImage*)Sender)->Canvas->Rectangle(imgx0,imgy0,X,Y);
+		}
+
 
 	}
 	if (elipse)
 	{
+		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
         if (curNode->out.size() != 0)
 			createBranch(history,curNode);
 		curNode->data.prev->data->Add("#Ellipse");
 		curNode->data.prev->data->Add(IntToStr(imgx0));
 		curNode->data.prev->data->Add(IntToStr(imgy0));
-		curNode->data.prev->data->Add(IntToStr(X));
-		curNode->data.prev->data->Add(IntToStr(Y));
+		if (Shift.Contains(ssShift))
+		{
+            curNode->data.prev->data->Add(IntToStr(abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0 + (Y - imgy0)));
+			curNode->data.prev->data->Add(IntToStr(abs(X - imgx0) > abs(Y - imgy0) ? imgy0 + (X - imgx0) : Y));
+            ((TImage*)Sender)->Canvas->Ellipse(imgx0,imgy0,
+												 abs(X - imgx0) > abs(Y - imgy0) ? X : imgx0 + (Y - imgy0),
+												 abs(X - imgx0) > abs(Y - imgy0) ? imgy0 + (X - imgx0) : Y);
+		}
+		else
+		{
+			curNode->data.prev->data->Add(IntToStr(X));
+			curNode->data.prev->data->Add(IntToStr(Y));
+            ((TImage*)Sender)->Canvas->Ellipse(imgx0,imgy0,X,Y);
+		}
 	}
 	if (erase)
 	{
@@ -552,39 +866,28 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 		Image1->Canvas->Brush->Color = Shape2->Brush->Color;
 		Image1->Canvas->Brush->Style = (TBrushStyle)ComboBox2->ItemIndex;
 	}
+	if (parametric)
+	{
+		imageLog->Clear();
+		imageLog->Add("#ParametricStart");
+		imageLog->Add(IntToStr(imgx0));
+		imageLog->Add(IntToStr(imgy0));
+		imageLog->Add(IntToStr(X));
+		imageLog->Add(IntToStr(Y));
+		imageLog->AddStrings(parametricLog);
+        if (curNode->out.size() != 0)
+            createBranch(history,curNode);
+		curNode->data.prev->data->AddStrings(imageLog);
+	}
     Form3->update();
     rect = false;
 	line = false;
 	pen = false;
 	elipse = false;
-    erase = false;
+	erase = false;
+    parametric = false;
 }
 //---------------------------------------------------------------------------
-
-
-void __fastcall TForm1::Save1Click(TObject *Sender)
-{
-	if (SaveDialog1->Execute() == mrOk)
-	{
-		GraphToStr(history,curNode,true)->SaveToFile(SaveDialog1->FileName);
-	}
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm1::Save2Click(TObject *Sender)
-{
-	if (OpenDialog1->Execute() == mrOk)
-	{
-		imageLog->LoadFromFile(OpenDialog1->FileName);
-		imgGraphClear(history);
-		GraphFromStr(history, curNode, imageLog);
-		delete imageLog;
-		imageLog = getCurLog(history, curNode);
-		readLog(imageLog);
-	}
-}
-//---------------------------------------------------------------------------
-
 
 void __fastcall TForm1::View1Click(TObject *Sender)
 {
@@ -763,7 +1066,7 @@ void __fastcall TForm1::SpeedButton3Click(TObject *Sender)
 
 void __fastcall TForm1::View2Click(TObject *Sender)
 {
-    if (SaveDialog1->Execute() == mrOk)
+	if (SaveDialog1->Execute() == mrOk)
 	{
 		GraphToStr(history,curNode,true)->SaveToFile(SaveDialog1->FileName);
 	}
@@ -772,13 +1075,13 @@ void __fastcall TForm1::View2Click(TObject *Sender)
 
 void __fastcall TForm1::Open1Click(TObject *Sender)
 {
-    if (OpenDialog1->Execute() == mrOk)
+	if (OpenDialog1->Execute() == mrOk)
 	{
 		imageLog->LoadFromFile(OpenDialog1->FileName);
 		imgGraphClear(history);
 		GraphFromStr(history, curNode, imageLog);
-		delete imageLog;
-		imageLog = getCurLog(history, curNode);
+		imageLog->SetStrings(initialLog);
+		imageLog->AddStrings(getCurLog(history, curNode));
 		readLog(imageLog);
 	}
 }
@@ -795,6 +1098,27 @@ void __fastcall TForm1::Redo2Click(TObject *Sender)
 {
     redo(history, curNode);
 	update();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Export2Click(TObject *Sender)
+{
+	if (SaveDialog1->Execute() == mrOk)
+	{
+    	imageLog->SetStrings(initialLog);
+		imageLog->AddStrings(getCurLog(history, curNode));
+		toParametric(imageLog)->SaveToFile(SaveDialog1->FileName);
+	}
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm1::SpeedButton5Click(TObject *Sender)
+{
+	if (OpenDialog1->Execute() == mrOk)
+	{
+		parametricLog->LoadFromFile(OpenDialog1->FileName);
+	}
 }
 //---------------------------------------------------------------------------
 

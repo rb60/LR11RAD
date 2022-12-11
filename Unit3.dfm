@@ -39,8 +39,8 @@ object Form3: TForm3
       TabOrder = 1
     end
     object Button1: TButton
-      Left = 16
-      Top = 56
+      Left = 535
+      Top = 46
       Width = 75
       Height = 25
       Caption = 'Update'
@@ -48,8 +48,8 @@ object Form3: TForm3
       OnClick = Button1Click
     end
     object Button2: TButton
-      Left = 104
-      Top = 56
+      Left = 535
+      Top = 15
       Width = 75
       Height = 25
       Caption = 'Execute'

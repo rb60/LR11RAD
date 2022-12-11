@@ -34,6 +34,7 @@ object Form1: TForm1
     Height = 81
     Align = alTop
     TabOrder = 0
+    ExplicitTop = -6
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -141,6 +142,22 @@ object Form1: TForm1
       Caption = 'R'
       OnClick = SpeedButton3Click
     end
+    object sbParametric: TSpeedButton
+      Left = 335
+      Top = 8
+      Width = 33
+      Height = 33
+      GroupIndex = 1
+      Caption = 'PAR'
+    end
+    object SpeedButton5: TSpeedButton
+      Left = 335
+      Top = 47
+      Width = 33
+      Height = 22
+      Caption = 'IMPR'
+      OnClick = SpeedButton5Click
+    end
     object ColorBox1: TColorBox
       Left = 584
       Top = 8
@@ -232,7 +249,7 @@ object Form1: TForm1
     Left = 288
     Top = 224
     object ree1: TMenuItem
-      Caption = 'Tree'
+      Caption = 'Log'
       object View1: TMenuItem
         Caption = 'View'
         OnClick = View1Click
@@ -259,6 +276,13 @@ object Form1: TForm1
     object Update1: TMenuItem
       Caption = 'Update'
       OnClick = Update1Click
+    end
+    object Export1: TMenuItem
+      Caption = 'Export'
+      object Export2: TMenuItem
+        Caption = 'As Parametric'
+        OnClick = Export2Click
+      end
     end
   end
   object OpenDialog1: TOpenDialog

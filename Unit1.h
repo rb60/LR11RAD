@@ -48,13 +48,15 @@ __published:	// IDE-managed Components
 	TMenuItem *Open1;
 	TMenuItem *Open2;
 	TMenuItem *Redo2;
+	TMenuItem *Export1;
+	TMenuItem *Export2;
+	TSpeedButton *sbParametric;
+	TSpeedButton *SpeedButton5;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
 	void __fastcall Image1MouseUp(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
-	void __fastcall Save1Click(TObject *Sender);
-	void __fastcall Save2Click(TObject *Sender);
 	void __fastcall View1Click(TObject *Sender);
 	void __fastcall ColorBox1Change(TObject *Sender);
 	void __fastcall ColorBox2Change(TObject *Sender);
@@ -75,12 +77,16 @@ __published:	// IDE-managed Components
 	void __fastcall Open1Click(TObject *Sender);
 	void __fastcall Open2Click(TObject *Sender);
 	void __fastcall Redo2Click(TObject *Sender);
+	void __fastcall Export2Click(TObject *Sender);
+	void __fastcall SpeedButton5Click(TObject *Sender);
 
 
 
 
 private:	// User declarations
-    void update();
+	void findMinMax(int& minx, int& maxx, int& miny, int& maxy, TStringList* imglog);
+	TStringList* toParametric(TStringList* imgLog);
+	void update();
     void clearImg();
 	void readLog(TStringList* imglog);
     void rotate(int angle);
