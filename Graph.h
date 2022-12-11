@@ -11,7 +11,7 @@ class Branch
 public:
 	Branch(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end);
 	Branch(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end, TBranch data);
-	Node<TBranch, TNode>*  start;
+	Node<TBranch, TNode>* start;
 	Node<TBranch, TNode>* end;
 	TBranch data;
 };
@@ -35,19 +35,20 @@ class Graph
 public:
 	Graph();
 	void CreateGraph(Node<TBranch, TNode>* n1, Node<TBranch, TNode>* n2, TBranch b);
-	void addNode(	Node<TBranch, TNode>* addTo,
-					Node<TBranch, TNode>* newNode,
-					TBranch bData);
+	void addNode(Node<TBranch, TNode>* addTo,
+		Node<TBranch, TNode>* newNode,
+		TBranch bData);
 
-	void addNode(	Node<TBranch, TNode>* previus,
-					Node<TBranch, TNode>* newNode,
-					Node<TBranch, TNode>* next,
-					TBranch bData1,
-					TBranch bData2);
+	void addNode(Node<TBranch, TNode>* previus,
+		Node<TBranch, TNode>* newNode,
+		Node<TBranch, TNode>* next,
+		TBranch bData1,
+		TBranch bData2);
 
 	void addBranch(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end, TBranch data);
 	void removeBranch(Branch<TBranch, TNode>* branch);
 	void removeNode(Node<TBranch, TNode>* node);
+	void Clear();
 	void setAllnotPassed();
 	bool isAncestorOf(Node<TBranch, TNode>* n1, Node<TBranch, TNode>* n2);
 	std::list<Node<TBranch, TNode>*> Path(Node<TBranch, TNode>* start, Node<TBranch, TNode>* end);
@@ -110,7 +111,7 @@ inline Graph<TBranch, TNode>::Graph()
 template<typename TBranch, typename TNode>
 inline void Graph<TBranch, TNode>::CreateGraph(Node<TBranch, TNode>* n1, Node<TBranch, TNode>* n2, TBranch b)
 {
-	Branch<TBranch, TNode> *branch = new Branch<TBranch, TNode>(n1, n2, b);
+	Branch<TBranch, TNode>* branch = new Branch<TBranch, TNode>(n1, n2, b);
 	n1->out.push_back(branch);
 	n2->in.push_back(branch);
 	nodes.push_back(n1);
@@ -123,7 +124,7 @@ template<typename TBranch, typename TNode>
 inline void Graph<TBranch, TNode>::addNode(Node<TBranch, TNode>* addTo, Node<TBranch, TNode>* newNode, TBranch bData)
 {
 
-	Branch<TBranch, TNode> *branch = new Branch<TBranch, TNode>(addTo, newNode, bData);
+	Branch<TBranch, TNode>* branch = new Branch<TBranch, TNode>(addTo, newNode, bData);
 	addTo->out.push_back(branch);
 	newNode->in.push_back(branch);
 	nodes.push_back(newNode);
@@ -145,9 +146,9 @@ inline void Graph<TBranch, TNode>::addNode(Node<TBranch, TNode>* previus, Node<T
 	Branch<TBranch, TNode >* b1 = new Branch<TBranch, TNode>(previus, newNode, bData1);
 	Branch<TBranch, TNode >* b2 = new Branch<TBranch, TNode>(newNode, next, bData2);
 	previus->out.push_back(b1);
-    newNode->in.push_back(b1);
+	newNode->in.push_back(b1);
 	next->in.push_back(b2);
-    newNode->out.push_back(b2);
+	newNode->out.push_back(b2);
 	branches.push_back(b1);
 	branches.push_back(b2);
 	nodes.push_back(newNode);
@@ -206,6 +207,23 @@ inline void Graph<TBranch, TNode>::removeNode(Node<TBranch, TNode>* node)
 			break;
 		}
 	}
+}
+
+template<typename TBranch, typename TNode>
+inline void Graph<TBranch, TNode>::Clear()
+{
+	for (int i = 0; i < nodes.size(); i++)
+	{
+		delete nodes[i];
+	}
+	for (int i = 0; i < branches.size(); i++)
+	{
+		delete branches[i];
+	}
+
+	nodes.clear();
+	branches.clear();
+
 }
 
 template<typename TBranch, typename TNode>

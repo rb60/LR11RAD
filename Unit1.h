@@ -26,27 +26,28 @@ __published:	// IDE-managed Components
 	TSpeedButton *sbPip;
 	TSpeedButton *sbErase;
 	TMainMenu *MainMenu1;
-	TMenuItem *Log1;
-	TMenuItem *Save1;
-	TMenuItem *Save2;
 	TOpenDialog *OpenDialog1;
 	TSaveDialog *SaveDialog1;
-	TMenuItem *View1;
 	TShape *Shape1;
 	TShape *Shape2;
 	TColorBox *ColorBox1;
 	TColorBox *ColorBox2;
 	TNumberBox *NumberBox1;
-	TMenuItem *UndoRedo;
 	TMenuItem *ree1;
-	TMenuItem *Undo1;
-	TMenuItem *Redo1;
 	TMenuItem *Update1;
 	TComboBox *ComboBox1;
 	TComboBox *ComboBox2;
 	TEdit *Edit1;
 	TFontDialog *FontDialog1;
 	TSpeedButton *SpeedButton1;
+	TSpeedButton *SpeedButton2;
+	TSpeedButton *SpeedButton3;
+	TNumberBox *NumberBox2;
+	TMenuItem *View1;
+	TMenuItem *View2;
+	TMenuItem *Open1;
+	TMenuItem *Open2;
+	TMenuItem *Redo2;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -58,9 +59,6 @@ __published:	// IDE-managed Components
 	void __fastcall ColorBox1Change(TObject *Sender);
 	void __fastcall ColorBox2Change(TObject *Sender);
 	void __fastcall NumberBox1ChangeValue(TObject *Sender);
-	void __fastcall ree1Click(TObject *Sender);
-	void __fastcall Undo1Click(TObject *Sender);
-	void __fastcall Redo1Click(TObject *Sender);
 	void __fastcall Update1Click(TObject *Sender);
 	void __fastcall ComboBox1Change(TObject *Sender);
 	void __fastcall ComboBox2Change(TObject *Sender);
@@ -71,14 +69,21 @@ __published:	// IDE-managed Components
           int X, int Y);
 	void __fastcall Shape2MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
+	void __fastcall SpeedButton2Click(TObject *Sender);
+	void __fastcall SpeedButton3Click(TObject *Sender);
+	void __fastcall View2Click(TObject *Sender);
+	void __fastcall Open1Click(TObject *Sender);
+	void __fastcall Open2Click(TObject *Sender);
+	void __fastcall Redo2Click(TObject *Sender);
 
 
 
 
 private:	// User declarations
+    void update();
     void clearImg();
 	void readLog(TStringList* imglog);
-
+    void rotate(int angle);
 	__property TFont Font = {read = getFont, write = setFont};
 	__property TBrushStyle BrushStyle = {read = getBrushStyle, write = setBrushStyle};
 	__property TPenStyle PenStyle = {read = getPenStyle, write = setPenStyle};

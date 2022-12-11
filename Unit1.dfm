@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 441
-  ClientWidth = 748
+  ClientWidth = 793
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -16,7 +16,7 @@ object Form1: TForm1
   object Image1: TImage
     Left = 0
     Top = 81
-    Width = 748
+    Width = 793
     Height = 360
     Align = alClient
     OnMouseDown = Image1MouseDown
@@ -30,12 +30,10 @@ object Form1: TForm1
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 748
+    Width = 793
     Height = 81
     Align = alTop
     TabOrder = 0
-    ExplicitLeft = -16
-    ExplicitTop = -16
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -99,16 +97,16 @@ object Form1: TForm1
       Caption = 'ERS'
     end
     object Shape1: TShape
-      Left = 340
-      Top = 9
+      Left = 492
+      Top = 7
       Width = 40
       Height = 50
       Brush.Color = clBlack
       OnMouseDown = Shape1MouseDown
     end
     object Shape2: TShape
-      Left = 386
-      Top = 9
+      Left = 538
+      Top = 7
       Width = 40
       Height = 51
       OnMouseDown = Shape2MouseDown
@@ -127,17 +125,33 @@ object Form1: TForm1
       ParentFont = False
       OnClick = SpeedButton1Click
     end
+    object SpeedButton2: TSpeedButton
+      Left = 242
+      Top = 47
+      Width = 33
+      Height = 22
+      Caption = 'CLS'
+      OnClick = SpeedButton2Click
+    end
+    object SpeedButton3: TSpeedButton
+      Left = 281
+      Top = 8
+      Width = 48
+      Height = 33
+      Caption = 'R'
+      OnClick = SpeedButton3Click
+    end
     object ColorBox1: TColorBox
-      Left = 432
-      Top = 9
+      Left = 584
+      Top = 8
       Width = 105
       Height = 22
       TabOrder = 0
       OnChange = ColorBox1Change
     end
     object ColorBox2: TColorBox
-      Left = 432
-      Top = 37
+      Left = 584
+      Top = 36
       Width = 105
       Height = 22
       Selected = clWhite
@@ -145,10 +159,10 @@ object Form1: TForm1
       OnChange = ColorBox2Change
     end
     object NumberBox1: TNumberBox
-      Left = 281
-      Top = 9
+      Left = 433
+      Top = 8
       Width = 49
-      Height = 22
+      Height = 23
       MinValue = 1.000000000000000000
       MaxValue = 5.000000000000000000
       TabOrder = 2
@@ -157,9 +171,9 @@ object Form1: TForm1
       OnChangeValue = NumberBox1ChangeValue
     end
     object ComboBox1: TComboBox
-      Left = 543
-      Top = 9
-      Width = 145
+      Left = 695
+      Top = 8
+      Width = 82
       Height = 23
       ItemIndex = 0
       TabOrder = 3
@@ -174,9 +188,9 @@ object Form1: TForm1
         'Clear')
     end
     object ComboBox2: TComboBox
-      Left = 543
-      Top = 38
-      Width = 145
+      Left = 695
+      Top = 36
+      Width = 82
       Height = 23
       ItemIndex = 0
       TabOrder = 4
@@ -191,6 +205,16 @@ object Form1: TForm1
         'BDiagonal'
         'Cross'
         'DiagCross')
+    end
+    object NumberBox2: TNumberBox
+      Left = 281
+      Top = 47
+      Width = 48
+      Height = 23
+      MinValue = 1.000000000000000000
+      MaxValue = 359.000000000000000000
+      TabOrder = 5
+      SpinButtonOptions.Placement = nbspCompact
     end
   end
   object Edit1: TEdit
@@ -207,37 +231,30 @@ object Form1: TForm1
   object MainMenu1: TMainMenu
     Left = 288
     Top = 224
-    object Log1: TMenuItem
-      Caption = 'Log'
-      object Save1: TMenuItem
-        Caption = 'Save'
-        OnClick = Save1Click
-      end
-      object Save2: TMenuItem
-        Caption = 'Open'
-        OnClick = Save2Click
-      end
+    object ree1: TMenuItem
+      Caption = 'Tree'
       object View1: TMenuItem
         Caption = 'View'
         OnClick = View1Click
       end
-    end
-    object UndoRedo: TMenuItem
-      Caption = 'UndoRedo'
-      object Undo1: TMenuItem
+      object View2: TMenuItem
+        Caption = 'Save'
+        OnClick = View2Click
+      end
+      object Open1: TMenuItem
+        Caption = 'Open'
+        OnClick = Open1Click
+      end
+      object Open2: TMenuItem
         Caption = 'Undo'
         ShortCut = 16474
-        OnClick = Undo1Click
+        OnClick = Open2Click
       end
-      object Redo1: TMenuItem
+      object Redo2: TMenuItem
         Caption = 'Redo'
         ShortCut = 16473
-        OnClick = Redo1Click
+        OnClick = Redo2Click
       end
-    end
-    object ree1: TMenuItem
-      Caption = 'Tree'
-      OnClick = ree1Click
     end
     object Update1: TMenuItem
       Caption = 'Update'
@@ -259,6 +276,6 @@ object Form1: TForm1
     Font.Name = 'Segoe UI'
     Font.Style = []
     Left = 496
-    Top = 232
+    Top = 224
   end
 end

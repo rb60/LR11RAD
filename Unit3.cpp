@@ -25,7 +25,7 @@ void TForm3::update()
 	}
 	ComboBox2->ItemIndex = 0;
     ComboBox3->ItemIndex = 0;
-    Memo1->Lines = GraphString(g, *cur);
+    Memo1->Lines = GraphToStr(g, *cur);
 }
 void __fastcall TForm3::Button1Click(TObject *Sender)
 {
@@ -44,7 +44,6 @@ void __fastcall TForm3::Button2Click(TObject *Sender)
 	case 1:
 		*cur = g->nodes[ComboBox2->ItemIndex];
 		break;
-
     default:
         ;
 	}

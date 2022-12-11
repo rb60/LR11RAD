@@ -7,6 +7,8 @@
 #include "Unit2.h"
 #include "Unit3.h"
 #include "Unit4.h"
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -69,6 +71,14 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+void TForm1::update()
+{
+	clearImg();
+	imageLog->SetStrings(initialLog);
+	imageLog->AddStrings(getCurLog(history,curNode));
+	readLog(imageLog);
+	Form3->update();
+}
 
 void TForm1::clearImg()
 {
@@ -76,6 +86,9 @@ void TForm1::clearImg()
     Image1->Canvas->Brush->Style	= bsSolid;
 	Image1->Canvas->Pen->Color	= clWhite;
 	Image1->Canvas->Rectangle(0,0, Image1->Width ,Image1->Height);
+    Image1->Canvas->Pen->Color = Shape1->Brush->Color;
+	Image1->Canvas->Brush->Color = Shape2->Brush->Color;
+	Image1->Canvas->Brush->Style = (TBrushStyle)ComboBox2->ItemIndex;
 
 }
 
@@ -207,11 +220,67 @@ void TForm1::readLog(TStringList* imglog)
 			Image1->Canvas->Pen->Color = Shape1->Brush->Color;
 			Image1->Canvas->Brush->Color = Shape2->Brush->Color;
 			Image1->Canvas->Brush->Style = (TBrushStyle)ComboBox2->ItemIndex;
-        }
-
-
+		}
+		else if (imglog->Strings[i] == "#Clear")
+		{
+            clearImg();
+		}
+		else if (imglog->Strings[i] == "#Rotate")
+		{
+			int angle = StrToInt(imglog->Strings[++i]);
+            rotate(angle);
+		}
 	}
 }
+
+
+
+void TForm1::rotate(int angle)
+{
+	TBitmap *newBitMap = new TBitmap();
+
+	float radians=(2*3.1416*angle)/360;
+
+	float cosine=(float)cos(radians);
+	float sine=(float)sin(radians);
+
+	float Point1x=(-Image1->Picture->Bitmap->Height*sine);
+	float Point1y=(Image1->Picture->Bitmap->Height*cosine);
+	float Point2x=(Image1->Picture->Bitmap->Width*cosine-Image1->Picture->Bitmap->Height*sine);
+	float Point2y=(Image1->Picture->Bitmap->Height*cosine+Image1->Picture->Bitmap->Width*sine);
+	float Point3x=(Image1->Picture->Bitmap->Width*cosine);
+	float Point3y=(Image1->Picture->Bitmap->Width*sine);
+
+	float minx=min(0,min(Point1x,min(Point2x,Point3x)));
+	float miny=min(0,min(Point1y,min(Point2y,Point3y)));
+	float maxx=max(Point1x,max(Point2x,Point3x));
+	float maxy=max(Point1y,max(Point2y,Point3y));
+
+	int newWidth=(int)ceil(fabs(maxx)-minx);
+	int newHeight=(int)ceil(fabs(maxy)-miny);
+
+	newBitMap->Height = newHeight;
+    newBitMap->Width = newWidth;
+
+	for(int x=0;x < newWidth;x++)
+	{
+		for(int y=0;y < newHeight;y++)
+		{
+			int SrcBitmapx=(int)((x+minx)*cosine+(y+miny)*sine);
+			int SrcBitmapy=(int)((y+miny)*cosine-(x+minx)*sine);
+
+			if(	SrcBitmapx >= 0 &&
+				SrcBitmapx < Image1->Picture->Bitmap->Width &&
+				SrcBitmapy >= 0 &&
+				SrcBitmapy < Image1->Picture->Bitmap->Height)
+			{
+				newBitMap->Canvas->Pixels[x][y] = Image1->Picture->Bitmap->Canvas->Pixels[SrcBitmapx][SrcBitmapy];
+			}
+		}
+	}
+    Image1->Picture->Bitmap = newBitMap;
+}
+
 
 TFont* TForm1::getFont()
 {
@@ -497,7 +566,7 @@ void __fastcall TForm1::Save1Click(TObject *Sender)
 {
 	if (SaveDialog1->Execute() == mrOk)
 	{
-		imageLog->SaveToFile(SaveDialog1->FileName);
+		GraphToStr(history,curNode,true)->SaveToFile(SaveDialog1->FileName);
 	}
 }
 //---------------------------------------------------------------------------
@@ -507,6 +576,10 @@ void __fastcall TForm1::Save2Click(TObject *Sender)
 	if (OpenDialog1->Execute() == mrOk)
 	{
 		imageLog->LoadFromFile(OpenDialog1->FileName);
+		imgGraphClear(history);
+		GraphFromStr(history, curNode, imageLog);
+		delete imageLog;
+		imageLog = getCurLog(history, curNode);
 		readLog(imageLog);
 	}
 }
@@ -515,50 +588,14 @@ void __fastcall TForm1::Save2Click(TObject *Sender)
 
 void __fastcall TForm1::View1Click(TObject *Sender)
 {
-	imageLog->SetStrings(initialLog);
-	imageLog->AddStrings(getCurLog(history,curNode));
-	Form2->Memo1->Lines->SetStrings(imageLog);
-	Form2->Show();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TForm1::ree1Click(TObject *Sender)
-{
 	Form3->update();
 	Form3->Show();
 }
-
-void __fastcall TForm1::Undo1Click(TObject *Sender)
-{
-	undo(history, curNode);
-	clearImg();
-	imageLog->SetStrings(initialLog);
-	imageLog->AddStrings(getCurLog(history,curNode));
-	readLog(imageLog);
-	Form3->update();
-}
 //---------------------------------------------------------------------------
-
-void __fastcall TForm1::Redo1Click(TObject *Sender)
-{
-	redo(history, curNode);
-	clearImg();
-	imageLog->SetStrings(initialLog);
-	imageLog->AddStrings(getCurLog(history,curNode));
-	readLog(imageLog);
-	Form3->update();
-}
-
-//---------------------------------------------------------------------------
-
 
 void __fastcall TForm1::Update1Click(TObject *Sender)
 {
-	clearImg();
-	imageLog->SetStrings(initialLog);
-	imageLog->AddStrings(getCurLog(history,curNode));
-	readLog(imageLog);
-	Form3->update();
+	update();
 }
 
 void __fastcall TForm1::ColorBox1Change(TObject *Sender)
@@ -700,6 +737,64 @@ void __fastcall TForm1::Shape2MouseDown(TObject *Sender, TMouseButton Button, TS
           int X, int Y)
 {
     penColorSelected = false;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::SpeedButton2Click(TObject *Sender)
+{
+	clearImg();
+	if (curNode->out.size() != 0)
+		createBranch(history,curNode);
+	curNode->data.prev->data->Add("#Clear");
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::SpeedButton3Click(TObject *Sender)
+{
+	rotate(NumberBox2->Value);
+    if (curNode->out.size() != 0)
+		createBranch(history,curNode);
+	curNode->data.prev->data->Add("#Rotate");
+	curNode->data.prev->data->Add(IntToStr((int)NumberBox2->Value));
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::View2Click(TObject *Sender)
+{
+    if (SaveDialog1->Execute() == mrOk)
+	{
+		GraphToStr(history,curNode,true)->SaveToFile(SaveDialog1->FileName);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Open1Click(TObject *Sender)
+{
+    if (OpenDialog1->Execute() == mrOk)
+	{
+		imageLog->LoadFromFile(OpenDialog1->FileName);
+		imgGraphClear(history);
+		GraphFromStr(history, curNode, imageLog);
+		delete imageLog;
+		imageLog = getCurLog(history, curNode);
+		readLog(imageLog);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Open2Click(TObject *Sender)
+{
+	undo(history, curNode);
+	update();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Redo2Click(TObject *Sender)
+{
+    redo(history, curNode);
+	update();
 }
 //---------------------------------------------------------------------------
 
