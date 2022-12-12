@@ -465,8 +465,11 @@ void TForm1::readLog(TStringList* imglog)
 				x2 = pX0 + pDx*x2;
 				y2 = pY0 + pDy*y2;
 			}
-			TRect source(x1, y1, x2, y2);
-			TRect dest(0,0, x2 - x1, y2 - y1);
+			TRect source(x1 < x2 ? x1 : x2,
+					 y1 < y2 ? y1 : y2,
+					 x1 < x2 ? x2 : x1,
+					 y1 < y2 ? y2 : y1);
+			TRect dest(0,0, abs(x2 - x1), abs(y2 - y1));
 			copyBuffer->Height = dest.Height();
 			copyBuffer->Width = dest.Width();
 			copyBuffer->Canvas->CopyRect(dest, Image1->Canvas, source);
@@ -474,7 +477,7 @@ void TForm1::readLog(TStringList* imglog)
 		}
         else if (imglog->Strings[i] == "#Paste")
 		{
-			int x,y;
+			int x, y, cpWidth = copyBuffer->Width, cpHeight = copyBuffer->Height;
 			i++;
 			x = StrToInt(imglog->Strings[i++]);
 			y = StrToInt(imglog->Strings[i]);
@@ -482,9 +485,14 @@ void TForm1::readLog(TStringList* imglog)
 			{
 				x = pX0 + pDx*x;
 				y = pY0 + pDy*y;
+				cpWidth *= pDx < 0 ? -1 : 1;
+				cpHeight *= pDy < 0 ? -1 : 1;
 			}
 			TRect source(0,0, copyBuffer->Width, copyBuffer->Height);
-			TRect dest(x,y, x + copyBuffer->Width, y + copyBuffer->Height);
+			TRect dest(x < x + cpWidth ? x : x + cpWidth,
+					 y < y + cpHeight ? y : y + cpHeight,
+					 x < x + cpWidth ? x + cpWidth : x,
+					 y < y + cpHeight ? y + cpHeight : y);
 			Image1->Canvas->CopyRect(dest, copyBuffer->Canvas, source);
 
 		}
@@ -899,7 +907,10 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 	if (copy)
 	{
 		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
-		TRect source(imgx0,imgy0, X, Y);
+		TRect source(imgx0 < X ? imgx0 : X,
+					 imgy0 < Y ? imgy0 : Y,
+					 imgx0 < X ? X : imgx0,
+					 imgy0 < Y ? Y : imgy0);
 		((TImage*)Sender)->Canvas->DrawFocusRect(source);
     }
 }
@@ -1012,18 +1023,21 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 	if (copy)
 	{
         ((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
-		TRect source(imgx0,imgy0, X, Y);
-		TRect dest(0,0, X - imgx0, Y - imgy0);
+		TRect source(imgx0 < X ? imgx0 : X,
+					 imgy0 < Y ? imgy0 : Y,
+					 imgx0 < X ? X : imgx0,
+					 imgy0 < Y ? Y : imgy0);
+		TRect dest(0,0, abs(X - imgx0), abs(Y - imgy0));
 		copyBuffer->Height = dest.Height();
 		copyBuffer->Width = dest.Width();
 		copyBuffer->Canvas->CopyRect(dest, ((TImage*)Sender)->Canvas, source);
         if (curNode->out.size() != 0)
             createBranch(history,curNode);
 		curNode->data.prev->data->Add("#Copy");
-		curNode->data.prev->data->Add(IntToStr(imgx0));
-		curNode->data.prev->data->Add(IntToStr(imgy0));
-		curNode->data.prev->data->Add(IntToStr(X));
-        curNode->data.prev->data->Add(IntToStr(Y));
+		curNode->data.prev->data->Add(IntToStr(imgx0 < X ? imgx0 : X));
+		curNode->data.prev->data->Add(IntToStr(imgy0 < Y ? imgy0 : Y));
+		curNode->data.prev->data->Add(IntToStr(imgx0 < X ? X : imgx0));
+        curNode->data.prev->data->Add(IntToStr(imgy0 < Y ? Y : imgy0));
 
 	}
 	Form3->update();

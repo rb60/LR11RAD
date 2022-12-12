@@ -20,7 +20,6 @@ object Form1: TForm1
     Height = 81
     Align = alTop
     TabOrder = 0
-    ExplicitLeft = -8
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
