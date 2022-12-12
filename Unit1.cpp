@@ -41,6 +41,7 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 	imageLog = new TStringList();
 	parametricLog = new TStringList();
 	buffer = new TBitmap();
+    copyBuffer = new TBitmap();
 
 	history = new Graph<TStringList*, NodeData>();
 	ImgNode* start = new ImgNode({0, nullptr, nullptr});
@@ -445,6 +446,29 @@ void TForm1::readLog(TStringList* imglog)
 			BrushColor = pBrushColor;
 			BrushStyle = pBrushStyle;
 		}
+		else if (imglog->Strings[i] == "#Copy")
+		{
+            int x1,y1,x2,y2;
+			i++;
+			x1 = StrToInt(imglog->Strings[i++]);
+			y1 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i]);
+			if (parametricLog)
+			{
+				x1 = pX0 + pDx*x1;
+				y1 = pY0 + pDy*y1;
+				x2 = pX0 + pDx*x2;
+				y2 = pY0 + pDy*y2;
+			}
+			TRect source(x1, y1, x2, y2);
+			TRect dest(0,0, x2 - x1, y2 - y1);
+			copyBuffer->Height = dest.Height();
+			copyBuffer->Width = dest.Width();
+			Image1->Canvas->DrawFocusRect(source);
+			copyBuffer->Canvas->CopyRect(dest, Image1->Canvas, source);
+
+        }
 	}
 }
 
@@ -657,6 +681,10 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 		parametric = true;
 		buffer->Assign(Image1->Picture->Bitmap);
 	}
+	if (sbCopy->Down)
+	{
+        copy = true;
+	}
 
 
 }
@@ -854,13 +882,31 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
             createBranch(history,curNode);
 		curNode->data.prev->data->AddStrings(imageLog);
 	}
-    Form3->update();
-    rect = false;
+	if (copy)
+	{
+		TRect source(imgx0,imgy0, X, Y);
+		TRect dest(0,0, X - imgx0, Y - imgy0);
+		copyBuffer->Height = dest.Height();
+		copyBuffer->Width = dest.Width();
+		((TImage*)Sender)->Canvas->DrawFocusRect(source);
+		copyBuffer->Canvas->CopyRect(dest, ((TImage*)Sender)->Canvas, source);
+        if (curNode->out.size() != 0)
+            createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Copy");
+		curNode->data.prev->data->Add(IntToStr(imgx0));
+		curNode->data.prev->data->Add(IntToStr(imgy0));
+		curNode->data.prev->data->Add(IntToStr(X));
+        curNode->data.prev->data->Add(IntToStr(Y));
+
+	}
+	Form3->update();
+	rect = false;
 	line = false;
 	pen = false;
 	elipse = false;
 	erase = false;
-    parametric = false;
+	parametric = false;
+	copy = false;
 }
 //---------------------------------------------------------------------------
 

@@ -157,7 +157,7 @@ object Form1: TForm1
       Caption = 'IMPR'
       OnClick = SpeedButton5Click
     end
-    object SpeedButton4: TSpeedButton
+    object sbCopy: TSpeedButton
       Left = 374
       Top = 8
       Width = 33

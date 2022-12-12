@@ -52,7 +52,7 @@ __published:	// IDE-managed Components
 	TMenuItem *Export2;
 	TSpeedButton *sbParametric;
 	TSpeedButton *SpeedButton5;
-	TSpeedButton *SpeedButton4;
+	TSpeedButton *sbCopy;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);

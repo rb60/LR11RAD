@@ -202,7 +202,8 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Pipette" &&
 			currentStr != "#EraseStart" &&
 			currentStr != "#Clear" &&
-			currentStr != "#Rotate")) &&
+			currentStr != "#Rotate" &&
+			currentStr != "#Copy")) &&
 			cur->data.prev->data->Count > 0);
 }
 
@@ -245,7 +246,8 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Pipette" &&
 			currentStr != "#EraseStart" &&
 			currentStr != "#Clear" &&
-			currentStr != "#Rotate")) &&
+			currentStr != "#Rotate"&&
+			currentStr != "#Copy")) &&
 			cur->data.next->data->Count > 0);
 }
 
