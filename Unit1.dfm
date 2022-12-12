@@ -34,7 +34,6 @@ object Form1: TForm1
     Height = 81
     Align = alTop
     TabOrder = 0
-    ExplicitTop = -6
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -157,6 +156,19 @@ object Form1: TForm1
       Height = 22
       Caption = 'IMPR'
       OnClick = SpeedButton5Click
+    end
+    object SpeedButton4: TSpeedButton
+      Left = 374
+      Top = 8
+      Width = 33
+      Height = 33
+      Caption = 'COPY'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
     end
     object ColorBox1: TColorBox
       Left = 584
