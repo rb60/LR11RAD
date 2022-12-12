@@ -79,6 +79,12 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
+void TForm1::resizeImg()
+{
+    Image1->Height = Image1->Picture->Bitmap->Height;
+	Image1->Width = Image1->Picture->Bitmap->Width;
+}
+
 void TForm1::findMinMax(int& minx, int& maxx, int& miny, int& maxy, TStringList* imglog)
 {
 	minx = miny = maxx = maxy = -1;
@@ -526,6 +532,7 @@ void TForm1::readLog(TStringList* imglog)
 				{
 					Image1->Picture->LoadFromFile(path);
 				}
+                resizeImg();
 			}
 			else
 			{
@@ -597,7 +604,8 @@ void TForm1::rotate(int angle)
 			}
 		}
 	}
-    Image1->Picture->Bitmap = newBitMap;
+	Image1->Picture->Bitmap = newBitMap;
+    resizeImg();
 }
 
 
@@ -1280,6 +1288,7 @@ void __fastcall TForm1::oCanvas1Click(TObject *Sender)
 			TPngImage  * loader = new TPngImage;
 			loader->LoadFromFile(path);
 			Image1->Picture->Bitmap->Assign(loader);
+			Image1->Height = Image1->Picture->Bitmap->Height;
 			delete loader;
 		}
 		if (path.SubString(path.Length() - 3, 4) == ".bmp")
@@ -1298,6 +1307,7 @@ void __fastcall TForm1::oCanvas1Click(TObject *Sender)
 			curNode->data.prev->data->Add("ToCanvas");
 			curNode->data.prev->data->Add(OpenDialog1->FileName);
 		}
+		resizeImg();
 
 
 	}

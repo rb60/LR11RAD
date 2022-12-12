@@ -61,6 +61,7 @@ __published:	// IDE-managed Components
 	TMenuItem *oCanvas1;
 	TMenuItem *oCanvas2;
 	TMenuItem *AsBMPImage1;
+	TScrollBox *ScrollBox1;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -101,6 +102,7 @@ private:	// User declarations
 	void clearImg();
 	void readLog(TStringList* imglog);
 	void rotate(int angle);
+    void resizeImg();
 	__property TFont Font = {read = getFont, write = setFont};
 	__property TBrushStyle BrushStyle = {read = getBrushStyle, write = setBrushStyle};
 	__property TPenStyle PenStyle = {read = getPenStyle, write = setPenStyle};

@@ -13,20 +13,6 @@ object Form1: TForm1
   Font.Style = []
   Menu = MainMenu1
   TextHeight = 15
-  object Image1: TImage
-    Left = 0
-    Top = 81
-    Width = 912
-    Height = 360
-    Align = alClient
-    OnMouseDown = Image1MouseDown
-    OnMouseMove = Image1MouseMove
-    OnMouseUp = Image1MouseUp
-    ExplicitLeft = 32
-    ExplicitTop = 136
-    ExplicitWidth = 105
-    ExplicitHeight = 105
-  end
   object Panel1: TPanel
     Left = 0
     Top = 0
@@ -293,6 +279,23 @@ object Form1: TForm1
     Visible = False
     OnExit = Edit1Exit
     OnKeyPress = Edit1KeyPress
+  end
+  object ScrollBox1: TScrollBox
+    Left = 0
+    Top = 81
+    Width = 912
+    Height = 360
+    Align = alClient
+    TabOrder = 2
+    object Image1: TImage
+      Left = -2
+      Top = -7
+      Width = 912
+      Height = 360
+      OnMouseDown = Image1MouseDown
+      OnMouseMove = Image1MouseMove
+      OnMouseUp = Image1MouseUp
+    end
   end
   object MainMenu1: TMainMenu
     Left = 288
