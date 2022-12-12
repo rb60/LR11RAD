@@ -80,78 +80,58 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 void TForm1::findMinMax(int& minx, int& maxx, int& miny, int& maxy, TStringList* imglog)
 {
 	minx = miny = maxx = maxy = -1;
+	int copyWidth, copyHeight;
 	for (int i = 0; i < imglog->Count; i++)
 	{
-		if (imglog->Strings[i] == "#Move")
+		if (	imglog->Strings[i] == "#Move" ||
+				imglog->Strings[i] == "#Line" ||
+				imglog->Strings[i] == "#Paste"
+				)
 		{
-			i++;
-			int x = StrToInt(imglog->Strings[i]);
-			i++;
-			int y = StrToInt(imglog->Strings[i]);
-			if (x < minx || minx == -1) minx = x;
-			if (x > maxx || maxx == -1) maxx = x;
-			if (y < miny || miny == -1) miny = y;
-			if (y > maxy || maxy == -1) maxy = y;
-		}
-		else if (imglog->Strings[i] == "#Line")
-		{
-			i++;
-			int x = StrToInt(imglog->Strings[i]);
-			i++;
-			int y = StrToInt(imglog->Strings[i]);
-			if (x < minx || minx == -1) minx = x;
-			if (x > maxx || maxx == -1) maxx = x;
-			if (y < miny || miny == -1) miny = y;
-			if (y > maxy || maxy == -1) maxy = y;
-		}
-		else if(imglog->Strings[i] == "#Rect")
-		{
-			int x1,y1,x2,y2;
-			i++;
-			x1 = StrToInt(imglog->Strings[i++]);
-			y1 = StrToInt(imglog->Strings[i++]);
-			x2 = StrToInt(imglog->Strings[i++]);
-			y2 = StrToInt(imglog->Strings[i]);
-			if (x1 < minx || minx == -1) minx = x1;
-			if (x1 > maxx || maxx == -1) maxx = x1;
-			if (y1 < miny || miny == -1) miny = y1;
-			if (y1 > maxy || maxy == -1) maxy = y1;
-
-			if (x2 < minx || minx == -1) minx = x2;
-			if (x2 > maxx || maxx == -1) maxx = x2;
-			if (y2 < miny || miny == -1) miny = y2;
-			if (y2 > maxy || maxy == -1) maxy = y2;
-		}
-        else if(imglog->Strings[i] == "#Ellipse")
-		{
-			int x1,y1,x2,y2;
-			i++;
-			x1 = StrToInt(imglog->Strings[i++]);
-			y1 = StrToInt(imglog->Strings[i++]);
-			x2 = StrToInt(imglog->Strings[i++]);
-			y2 = StrToInt(imglog->Strings[i]);
-			if (x1 < minx || minx == -1) minx = x1;
-			if (x1 > maxx || maxx == -1) maxx = x1;
-			if (y1 < miny || miny == -1) miny = y1;
-			if (y1 > maxy || maxy == -1) maxy = y1;
-
-			if (x2 < minx || minx == -1) minx = x2;
-			if (x2 > maxx || maxx == -1) maxx = x2;
-			if (y2 < miny || miny == -1) miny = y2;
-			if (y2 > maxy || maxy == -1) maxy = y2;
-		}
-		else if(imglog->Strings[i] == "#EraseStart" || imglog->Strings[i] == "#Erase")
-		{
+			bool mmPaste = imglog->Strings[i] == "#Paste";
 			int x,y;
 			i++;
 			x = StrToInt(imglog->Strings[i++]);
-			y = StrToInt(imglog->Strings[i++]);
-			Image1->Canvas->Rectangle(x - PenWidth*5, y - PenWidth*5, x + PenWidth*5, y + PenWidth*5);
+			y = StrToInt(imglog->Strings[i]);
+
+			if (mmPaste)
+			{
+				if (x + copyWidth > maxx || maxx == -1) maxx = x + copyWidth;
+				if (y + copyHeight > maxy || maxy == -1) maxy = y + copyHeight;
+			}
+
             if (x < minx || minx == -1) minx = x;
 			if (x > maxx || maxx == -1) maxx = x;
 			if (y < miny || miny == -1) miny = y;
 			if (y > maxy || maxy == -1) maxy = y;
+		}
+		else if(imglog->Strings[i] == "#Rect" ||
+				imglog->Strings[i] == "#Ellipse" ||
+				imglog->Strings[i] == "#Copy")
+		{
+			bool mmPaste = imglog->Strings[i] == "#Copy";
+			int x1,y1,x2,y2;
+			i++;
+			x1 = StrToInt(imglog->Strings[i++]);
+			y1 = StrToInt(imglog->Strings[i++]);
+			x2 = StrToInt(imglog->Strings[i++]);
+			y2 = StrToInt(imglog->Strings[i]);
 
+			if (mmPaste)
+			{
+				copyWidth = x2 - x1;
+				copyHeight = y2 - y1;
+			}
+
+			if (x1 < minx || minx == -1) minx = x1;
+			if (x1 > maxx || maxx == -1) maxx = x1;
+			if (y1 < miny || miny == -1) miny = y1;
+			if (y1 > maxy || maxy == -1) maxy = y1;
+
+			if (x2 < minx || minx == -1) minx = x2;
+			if (x2 > maxx || maxx == -1) maxx = x2;
+			if (y2 < miny || miny == -1) miny = y2;
+			if (y2 > maxy || maxy == -1) maxy = y2;
 		}
 	}
 }
@@ -168,7 +148,8 @@ TStringList* TForm1::toParametric(TStringList* imglog)
 		if (imglog->Strings[i] == "#Move" ||
             imglog->Strings[i] == "#Line" ||
 			imglog->Strings[i] == "#EraseStart" ||
-			imglog->Strings[i] == "#Erase")
+			imglog->Strings[i] == "#Erase" ||
+			imglog->Strings[i] == "#Paste")
 		{
 			result->Add(imglog->Strings[i++]);
 			int x = StrToInt(imglog->Strings[i++]);
@@ -186,7 +167,8 @@ TStringList* TForm1::toParametric(TStringList* imglog)
             result->Add(imglog->Strings[i]);
 		}
 		else if(imglog->Strings[i] == "#Rect" ||
-				imglog->Strings[i] == "#Ellipse")
+				imglog->Strings[i] == "#Ellipse" ||
+				imglog->Strings[i] == "#Copy")
 		{
             result->Add(imglog->Strings[i++]);
 			int x1,y1,x2,y2;
@@ -465,8 +447,23 @@ void TForm1::readLog(TStringList* imglog)
 			TRect dest(0,0, x2 - x1, y2 - y1);
 			copyBuffer->Height = dest.Height();
 			copyBuffer->Width = dest.Width();
-			Image1->Canvas->DrawFocusRect(source);
 			copyBuffer->Canvas->CopyRect(dest, Image1->Canvas, source);
+
+		}
+        else if (imglog->Strings[i] == "#Paste")
+		{
+			int x,y;
+			i++;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i]);
+			if (parametricLog)
+			{
+				x = pX0 + pDx*x;
+				y = pY0 + pDy*y;
+			}
+			TRect source(0,0, copyBuffer->Width, copyBuffer->Height);
+			TRect dest(x,y, x + copyBuffer->Width, y + copyBuffer->Height);
+			Image1->Canvas->CopyRect(dest, copyBuffer->Canvas, source);
 
         }
 	}
@@ -683,7 +680,19 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 	}
 	if (sbCopy->Down)
 	{
+        buffer->Assign(Image1->Picture->Bitmap);
         copy = true;
+	}
+	if (sbPaste->Down)
+	{
+		TRect source(0,0, copyBuffer->Width, copyBuffer->Height);
+		TRect dest(X,Y, X + copyBuffer->Width, Y + copyBuffer->Height);
+		((TImage*)Sender)->Canvas->CopyRect(dest, copyBuffer->Canvas, source);
+        if (curNode->out.size() != 0)
+            createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Paste");
+        curNode->data.prev->data->Add(IntToStr(X));
+		curNode->data.prev->data->Add(IntToStr(Y));
 	}
 
 
@@ -775,6 +784,12 @@ void __fastcall TForm1::Image1MouseMove(TObject *Sender, TShiftState Shift, int 
 		imageLog->AddStrings(parametricLog);
 		readLog(imageLog);
 	}
+	if (copy)
+	{
+		((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
+		TRect source(imgx0,imgy0, X, Y);
+		((TImage*)Sender)->Canvas->DrawFocusRect(source);
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShiftState Shift,
@@ -884,11 +899,11 @@ void __fastcall TForm1::Image1MouseUp(TObject *Sender, TMouseButton Button, TShi
 	}
 	if (copy)
 	{
+        ((TImage*)Sender)->Picture->Bitmap->Assign(buffer);
 		TRect source(imgx0,imgy0, X, Y);
 		TRect dest(0,0, X - imgx0, Y - imgy0);
 		copyBuffer->Height = dest.Height();
 		copyBuffer->Width = dest.Width();
-		((TImage*)Sender)->Canvas->DrawFocusRect(source);
 		copyBuffer->Canvas->CopyRect(dest, ((TImage*)Sender)->Canvas, source);
         if (curNode->out.size() != 0)
             createBranch(history,curNode);

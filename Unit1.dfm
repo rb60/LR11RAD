@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 441
-  ClientWidth = 793
+  ClientWidth = 912
   Color = clBtnFace
   DoubleBuffered = True
   Font.Charset = DEFAULT_CHARSET
@@ -16,7 +16,7 @@ object Form1: TForm1
   object Image1: TImage
     Left = 0
     Top = 81
-    Width = 793
+    Width = 912
     Height = 360
     Align = alClient
     OnMouseDown = Image1MouseDown
@@ -30,10 +30,11 @@ object Form1: TForm1
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 793
+    Width = 912
     Height = 81
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 793
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -97,7 +98,7 @@ object Form1: TForm1
       Caption = 'ERS'
     end
     object Shape1: TShape
-      Left = 492
+      Left = 612
       Top = 7
       Width = 40
       Height = 50
@@ -105,7 +106,7 @@ object Form1: TForm1
       OnMouseDown = Shape1MouseDown
     end
     object Shape2: TShape
-      Left = 538
+      Left = 658
       Top = 7
       Width = 40
       Height = 51
@@ -162,6 +163,7 @@ object Form1: TForm1
       Top = 8
       Width = 33
       Height = 33
+      GroupIndex = 1
       Caption = 'COPY'
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
@@ -170,8 +172,22 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
     end
+    object sbPaste: TSpeedButton
+      Left = 413
+      Top = 8
+      Width = 33
+      Height = 33
+      GroupIndex = 1
+      Caption = 'PASTE'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -9
+      Font.Name = 'Segoe UI'
+      Font.Style = []
+      ParentFont = False
+    end
     object ColorBox1: TColorBox
-      Left = 584
+      Left = 704
       Top = 8
       Width = 105
       Height = 22
@@ -179,7 +195,7 @@ object Form1: TForm1
       OnChange = ColorBox1Change
     end
     object ColorBox2: TColorBox
-      Left = 584
+      Left = 704
       Top = 36
       Width = 105
       Height = 22
@@ -188,7 +204,7 @@ object Form1: TForm1
       OnChange = ColorBox2Change
     end
     object NumberBox1: TNumberBox
-      Left = 433
+      Left = 553
       Top = 8
       Width = 49
       Height = 23
@@ -200,7 +216,7 @@ object Form1: TForm1
       OnChangeValue = NumberBox1ChangeValue
     end
     object ComboBox1: TComboBox
-      Left = 695
+      Left = 815
       Top = 8
       Width = 82
       Height = 23
@@ -217,7 +233,7 @@ object Form1: TForm1
         'Clear')
     end
     object ComboBox2: TComboBox
-      Left = 695
+      Left = 815
       Top = 36
       Width = 82
       Height = 23

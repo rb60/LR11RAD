@@ -203,7 +203,8 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#EraseStart" &&
 			currentStr != "#Clear" &&
 			currentStr != "#Rotate" &&
-			currentStr != "#Copy")) &&
+			currentStr != "#Copy" &&
+			currentStr != "#Paste")) &&
 			cur->data.prev->data->Count > 0);
 }
 
@@ -247,7 +248,8 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#EraseStart" &&
 			currentStr != "#Clear" &&
 			currentStr != "#Rotate"&&
-			currentStr != "#Copy")) &&
+			currentStr != "#Copy" &&
+			currentStr != "#Paste")) &&
 			cur->data.next->data->Count > 0);
 }
 
