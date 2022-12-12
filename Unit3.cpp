@@ -12,6 +12,7 @@ TForm3 *Form3;
 __fastcall TForm3::TForm3(TComponent* Owner)
 	: TForm(Owner)
 {
+    owner = (TForm1*)Owner;
 }
 //---------------------------------------------------------------------------
 void TForm3::update()
@@ -25,7 +26,8 @@ void TForm3::update()
 	}
 	ComboBox2->ItemIndex = 0;
     ComboBox3->ItemIndex = 0;
-    Memo1->Lines = GraphToStr(g, *cur);
+	Memo1->Lines = GraphToStr(g, *cur);
+    owner->update();
 }
 void __fastcall TForm3::Button1Click(TObject *Sender)
 {
@@ -47,6 +49,7 @@ void __fastcall TForm3::Button2Click(TObject *Sender)
     default:
         ;
 	}
+    update();
 
 }
 //---------------------------------------------------------------------------

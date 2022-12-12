@@ -3,6 +3,7 @@
 #ifndef Unit3H
 #define Unit3H
 //---------------------------------------------------------------------------
+#include "Unit1.h"
 #include <System.Classes.hpp>
 #include <Vcl.Controls.hpp>
 #include <Vcl.StdCtrls.hpp>
@@ -24,6 +25,7 @@ __published:	// IDE-managed Components
 	void __fastcall Button2Click(TObject *Sender);
 	void __fastcall ComboBox1Change(TObject *Sender);
 private:	// User declarations
+    TForm1* owner;
 public:		// User declarations
 	void update();
 	ImgGraph* g;

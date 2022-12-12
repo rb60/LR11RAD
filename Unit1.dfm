@@ -212,7 +212,7 @@ object Form1: TForm1
       OnChange = ColorBox2Change
     end
     object NumberBox1: TNumberBox
-      Left = 553
+      Left = 557
       Top = 8
       Width = 49
       Height = 23
@@ -322,15 +322,26 @@ object Form1: TForm1
         OnClick = Redo2Click
       end
     end
-    object Update1: TMenuItem
-      Caption = 'Update'
-      OnClick = Update1Click
+    object Import1: TMenuItem
+      Caption = 'Import'
+      object oCanvas1: TMenuItem
+        Caption = 'To Canvas'
+        OnClick = oCanvas1Click
+      end
+      object oCanvas2: TMenuItem
+        Caption = 'To Copy Buffer'
+        OnClick = oCanvas2Click
+      end
     end
     object Export1: TMenuItem
       Caption = 'Export'
       object Export2: TMenuItem
         Caption = 'As Parametric'
         OnClick = Export2Click
+      end
+      object AsBMPImage1: TMenuItem
+        Caption = 'As BMP Image'
+        OnClick = AsBMPImage1Click
       end
     end
   end

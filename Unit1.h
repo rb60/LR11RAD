@@ -12,6 +12,8 @@
 #include <Vcl.Menus.hpp>
 #include <Vcl.Dialogs.hpp>
 #include <Vcl.NumberBox.hpp>
+#include <jpeg.hpp>
+#include <pngimage.hpp>
 //---------------------------------------------------------------------------
 class TForm1 : public TForm
 {
@@ -34,7 +36,6 @@ __published:	// IDE-managed Components
 	TColorBox *ColorBox2;
 	TNumberBox *NumberBox1;
 	TMenuItem *ree1;
-	TMenuItem *Update1;
 	TComboBox *ComboBox1;
 	TComboBox *ComboBox2;
 	TEdit *Edit1;
@@ -56,6 +57,10 @@ __published:	// IDE-managed Components
 	TSpeedButton *sbPaste;
 	TSpeedButton *sbFlood;
 	TComboBox *ComboBox3;
+	TMenuItem *Import1;
+	TMenuItem *oCanvas1;
+	TMenuItem *oCanvas2;
+	TMenuItem *AsBMPImage1;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
@@ -83,6 +88,9 @@ __published:	// IDE-managed Components
 	void __fastcall Redo2Click(TObject *Sender);
 	void __fastcall Export2Click(TObject *Sender);
 	void __fastcall SpeedButton5Click(TObject *Sender);
+	void __fastcall oCanvas1Click(TObject *Sender);
+	void __fastcall oCanvas2Click(TObject *Sender);
+	void __fastcall AsBMPImage1Click(TObject *Sender);
 
 
 
@@ -90,23 +98,22 @@ __published:	// IDE-managed Components
 private:	// User declarations
 	void findMinMax(int& minx, int& maxx, int& miny, int& maxy, TStringList* imglog);
 	TStringList* toParametric(TStringList* imgLog);
-	void update();
-    void clearImg();
+	void clearImg();
 	void readLog(TStringList* imglog);
-    void rotate(int angle);
+	void rotate(int angle);
 	__property TFont Font = {read = getFont, write = setFont};
 	__property TBrushStyle BrushStyle = {read = getBrushStyle, write = setBrushStyle};
 	__property TPenStyle PenStyle = {read = getPenStyle, write = setPenStyle};
 	__property TColor PenColor = {read = getPenColor, write = setPenColor};
 	__property TColor BrushColor = {read = getBrushColor, write = setBrushColor};
 	__property int PenWidth = {read = getPenWidth, write = setPenWidth};
-    TFont* getFont();
+	TFont* getFont();
 	TBrushStyle getBrushStyle();
 	TPenStyle getPenStyle();
 	int getPenWidth();
 	TColor getPenColor();
 	TColor getBrushColor();
-    void setFont(TFont* value);
+	void setFont(TFont* value);
 	void setBrushStyle(TBrushStyle value);
 	void setPenStyle(TPenStyle value);
 	void setPenWidth(int value);
@@ -115,6 +122,7 @@ private:	// User declarations
 
 public:		// User declarations
 	__fastcall TForm1(TComponent* Owner);
+    void update();
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;

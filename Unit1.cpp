@@ -7,6 +7,8 @@
 #include "Unit2.h"
 #include "Unit3.h"
 #include "Unit4.h"
+#include <jpeg.hpp>
+#include <pngimage.hpp>
 #define min(a, b)  (((a) < (b)) ? (a) : (b))
 #define max(a, b)  (((a) > (b)) ? (a) : (b))
 //---------------------------------------------------------------------------
@@ -221,7 +223,6 @@ void TForm1::update()
 	imageLog->SetStrings(initialLog);
 	imageLog->AddStrings(getCurLog(history,curNode));
 	readLog(imageLog);
-	Form3->update();
 }
 
 void TForm1::clearImg()
@@ -244,6 +245,7 @@ void TForm1::readLog(TStringList* imglog)
 	TPenStyle pPenStyle;
 	TBrushStyle pBrushStyle;
 	bool parametricLog = false;
+	
 	for (int i = 0; i < imglog->Count; i++)
 	{
 		if (imglog->Strings[i] == "#Move")
@@ -255,7 +257,7 @@ void TForm1::readLog(TStringList* imglog)
 			{
 				x = pX0 + pDx*x;
 				y = pY0 + pDy*y;
-            }
+			}
 			Image1->Canvas->MoveTo(x,y);
 		}
 		else if (imglog->Strings[i] == "#Line")
@@ -500,6 +502,54 @@ void TForm1::readLog(TStringList* imglog)
 			{
                 Image1->Canvas->FloodFill(x,y,PenColor,fsBorder);
             }
+		}
+		else if(imglog->Strings[i] == "#Import")
+		{
+			if (imglog->Strings[++i] == "ToCanvas")
+			{
+				String path = imglog->Strings[++i];
+				if ( path.SubString(path.Length() - 3, 4) == ".jpg" || (path.Length() > 5 && path.SubString(path.Length() - 4, 5) == ".jpeg"))
+				{
+					TJPEGImage * loader = new TJPEGImage;
+					loader->LoadFromFile(path);
+					Image1->Picture->Bitmap->Assign(loader);
+					delete loader;
+				}
+				if (path.SubString(path.Length() - 3, 4) == ".png")
+				{
+					TPngImage  * loader = new TPngImage;
+					loader->LoadFromFile(path);
+					Image1->Picture->Bitmap->Assign(loader);
+					delete loader;
+				}
+				if (path.SubString(path.Length() - 3, 4) == ".bmp")
+				{
+					Image1->Picture->LoadFromFile(path);
+				}
+			}
+			else
+			{
+
+				String path = imglog->Strings[++i];
+				if (path.SubString(path.Length() - 3, 4) == ".jpg" || (path.Length() > 5 && path.SubString(path.Length() - 4, 5) == ".jpeg"))
+				{
+					TJPEGImage * loader = new TJPEGImage;
+					loader->LoadFromFile(path);
+					copyBuffer->Assign(loader);
+					delete loader;
+				}
+				if (path.SubString(path.Length() - 3, 4) == ".png")
+				{
+					TPngImage  * loader = new TPngImage;
+					loader->LoadFromFile(path);
+					copyBuffer->Assign(loader);
+					delete loader;
+				}
+				if (path.SubString(path.Length() - 3, 4) == ".bmp")
+				{
+					copyBuffer->LoadFromFile(path);
+				}
+			}
         }
 	}
 }
@@ -643,7 +693,6 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
 		curNode->data.prev->data->Add("#Move");
 		curNode->data.prev->data->Add(IntToStr(X));
 		curNode->data.prev->data->Add(IntToStr(Y));
-        Form3->update();
 	}
 	if (sbLine->Down)
 	{
@@ -1214,8 +1263,93 @@ void __fastcall TForm1::SpeedButton5Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TForm1::oCanvas1Click(TObject *Sender)
+{
+	if (OpenDialog1->Execute() == mrOk)
+	{
+		String path = OpenDialog1->FileName;
+		if ( path.SubString(path.Length() - 3, 4) == ".jpg" || (path.Length() > 5 && path.SubString(path.Length() - 4, 5) == ".jpeg"))
+		{
+			TJPEGImage * loader = new TJPEGImage;
+			loader->LoadFromFile(path);
+			Image1->Picture->Bitmap->Assign(loader);
+			delete loader;
+		}
+		if (path.SubString(path.Length() - 3, 4) == ".png")
+		{
+			TPngImage  * loader = new TPngImage;
+			loader->LoadFromFile(path);
+			Image1->Picture->Bitmap->Assign(loader);
+			delete loader;
+		}
+		if (path.SubString(path.Length() - 3, 4) == ".bmp")
+		{
+			Image1->Picture->LoadFromFile(path);
+		}
+
+		if (path.SubString(path.Length() - 3, 4) == ".jpg" ||
+			path.SubString(path.Length() - 4, 5) == ".jpeg" ||
+			path.SubString(path.Length() - 3, 4) == ".png" ||
+			path.SubString(path.Length() - 3, 4) == ".bmp")
+		{
+			if (curNode->out.size() != 0)
+				createBranch(history,curNode);
+			curNode->data.prev->data->Add("#Import");
+			curNode->data.prev->data->Add("ToCanvas");
+			curNode->data.prev->data->Add(OpenDialog1->FileName);
+		}
 
 
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::oCanvas2Click(TObject *Sender)
+{
+	if (OpenDialog1->Execute() == mrOk)
+	{
+		String path = OpenDialog1->FileName;
+		if (path.SubString(path.Length() - 3, 4) == ".jpg" || (path.Length() > 5 && path.SubString(path.Length() - 4, 5) == ".jpeg"))
+		{
+			TJPEGImage * loader = new TJPEGImage;
+			loader->LoadFromFile(path);
+			copyBuffer->Assign(loader);
+			delete loader;
+		}
+		if (path.SubString(path.Length() - 3, 4) == ".png")
+		{
+			TPngImage  * loader = new TPngImage;
+			loader->LoadFromFile(path);
+			copyBuffer->Assign(loader);
+			delete loader;
+		}
+		if (path.SubString(path.Length() - 3, 4) == ".bmp")
+		{
+			copyBuffer->LoadFromFile(path);
+		}
+
+		if (path.SubString(path.Length() - 3, 4) == ".jpg" ||
+			path.SubString(path.Length() - 4, 5) == ".jpeg" ||
+			path.SubString(path.Length() - 3, 4) == ".png" ||
+			path.SubString(path.Length() - 3, 4) == ".bmp")
+		{
+			if (curNode->out.size() != 0)
+				createBranch(history,curNode);
+			curNode->data.prev->data->Add("#Import");
+			curNode->data.prev->data->Add("ToCopy");
+			curNode->data.prev->data->Add(OpenDialog1->FileName);
+		}
+	}
+}
+//---------------------------------------------------------------------------
 
 
+void __fastcall TForm1::AsBMPImage1Click(TObject *Sender)
+{
+	if (SaveDialog1->Execute() == mrOk)
+	{
+		Image1->Picture->SaveToFile(SaveDialog1->FileName);
+	}
+}
+//---------------------------------------------------------------------------
 
