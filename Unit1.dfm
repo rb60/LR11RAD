@@ -285,10 +285,13 @@ object Form1: TForm1
     Top = 81
     Width = 912
     Height = 360
+    HorzScrollBar.Position = 19
+    HorzScrollBar.Smooth = True
+    VertScrollBar.Smooth = True
     Align = alClient
     TabOrder = 2
     object Image1: TImage
-      Left = -2
+      Left = -21
       Top = -7
       Width = 912
       Height = 360
