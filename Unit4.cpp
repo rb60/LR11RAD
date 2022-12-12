@@ -204,7 +204,8 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Clear" &&
 			currentStr != "#Rotate" &&
 			currentStr != "#Copy" &&
-			currentStr != "#Paste")) &&
+			currentStr != "#Paste" &&
+			currentStr != "#Flood")) &&
 			cur->data.prev->data->Count > 0);
 }
 
@@ -249,7 +250,8 @@ void moveForward(Node<TStringList*, NodeData>* cur)
 			currentStr != "#Clear" &&
 			currentStr != "#Rotate"&&
 			currentStr != "#Copy" &&
-			currentStr != "#Paste")) &&
+			currentStr != "#Paste" &&
+			currentStr != "#Flood")) &&
 			cur->data.next->data->Count > 0);
 }
 

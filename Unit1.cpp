@@ -100,7 +100,7 @@ void TForm1::findMinMax(int& minx, int& maxx, int& miny, int& maxy, TStringList*
 				if (y + copyHeight > maxy || maxy == -1) maxy = y + copyHeight;
 			}
 
-            if (x < minx || minx == -1) minx = x;
+			if (x < minx || minx == -1) minx = x;
 			if (x > maxx || maxx == -1) maxx = x;
 			if (y < miny || miny == -1) miny = y;
 			if (y > maxy || maxy == -1) maxy = y;
@@ -133,6 +133,19 @@ void TForm1::findMinMax(int& minx, int& maxx, int& miny, int& maxy, TStringList*
 			if (y2 < miny || miny == -1) miny = y2;
 			if (y2 > maxy || maxy == -1) maxy = y2;
 		}
+		else if(imglog->Strings[i] == "#Pipette" ||
+				imglog->Strings[i] == "#Flood")
+		{
+            int x,y;
+			i++;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i]);
+
+            if (x < minx || minx == -1) minx = x;
+			if (x > maxx || maxx == -1) maxx = x;
+			if (y < miny || miny == -1) miny = y;
+			if (y > maxy || maxy == -1) maxy = y;
+        }
 	}
 }
 
@@ -181,7 +194,8 @@ TStringList* TForm1::toParametric(TStringList* imglog)
 			result->Add(IntToStr(x2 - minx));
 			result->Add(IntToStr(y2 - miny));
 		}
-		else if(imglog->Strings[i] == "#Pipette")
+		else if(imglog->Strings[i] == "#Pipette" ||
+				imglog->Strings[i] == "#Flood")
 		{
 			result->Add(imglog->Strings[i++]);
 			int x,y;
@@ -465,6 +479,27 @@ void TForm1::readLog(TStringList* imglog)
 			TRect dest(x,y, x + copyBuffer->Width, y + copyBuffer->Height);
 			Image1->Canvas->CopyRect(dest, copyBuffer->Canvas, source);
 
+		}
+		else if(imglog->Strings[i] == "#Flood")
+		{
+            int x,y;
+			i++;
+			x = StrToInt(imglog->Strings[i++]);
+			y = StrToInt(imglog->Strings[i++]);
+			if (parametricLog)
+			{
+				x = pX0 + pDx*x;
+				y = pY0 + pDy*y;
+			}
+
+			if (imglog->Strings[i] == "Surface")
+			{
+				Image1->Canvas->FloodFill(x,y,Image1->Canvas->Pixels[x][y],fsSurface);
+			}
+			else
+			{
+                Image1->Canvas->FloodFill(x,y,PenColor,fsBorder);
+            }
         }
 	}
 }
@@ -691,8 +726,28 @@ void __fastcall TForm1::Image1MouseDown(TObject *Sender, TMouseButton Button, TS
         if (curNode->out.size() != 0)
             createBranch(history,curNode);
 		curNode->data.prev->data->Add("#Paste");
-        curNode->data.prev->data->Add(IntToStr(X));
+		curNode->data.prev->data->Add(IntToStr(X));
 		curNode->data.prev->data->Add(IntToStr(Y));
+	}
+	if (sbFlood->Down)
+	{
+		if (curNode->out.size() != 0)
+			createBranch(history,curNode);
+		curNode->data.prev->data->Add("#Flood");
+		curNode->data.prev->data->Add(IntToStr(X));
+		curNode->data.prev->data->Add(IntToStr(Y));
+
+		if (ComboBox3->ItemIndex == 0)
+		{
+			((TImage*)Sender)->Canvas->FloodFill(X,Y,((TImage*)Sender)->Canvas->Pixels[X][Y],fsSurface);
+			curNode->data.prev->data->Add("Surface");
+
+		}
+		else
+		{
+			((TImage*)Sender)->Canvas->FloodFill(X,Y,PenColor,fsBorder);
+            curNode->data.prev->data->Add("Border");
+        }
 	}
 
 
@@ -1158,4 +1213,9 @@ void __fastcall TForm1::SpeedButton5Click(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
+
+
+
+
+
 

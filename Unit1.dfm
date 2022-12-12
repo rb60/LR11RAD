@@ -34,7 +34,7 @@ object Form1: TForm1
     Height = 81
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 793
+    ExplicitLeft = -8
     object sbPencil: TSpeedButton
       Left = 8
       Top = 8
@@ -61,7 +61,7 @@ object Form1: TForm1
     end
     object sbText: TSpeedButton
       Left = 164
-      Top = 9
+      Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
@@ -75,7 +75,7 @@ object Form1: TForm1
     end
     object sbElipse: TSpeedButton
       Left = 125
-      Top = 9
+      Top = 8
       Width = 33
       Height = 33
       GroupIndex = 1
@@ -186,6 +186,14 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
     end
+    object sbFlood: TSpeedButton
+      Left = 452
+      Top = 8
+      Width = 69
+      Height = 33
+      GroupIndex = 1
+      Caption = 'Fllood'
+    end
     object ColorBox1: TColorBox
       Left = 704
       Top = 8
@@ -260,6 +268,19 @@ object Form1: TForm1
       MaxValue = 359.000000000000000000
       TabOrder = 5
       SpinButtonOptions.Placement = nbspCompact
+    end
+    object ComboBox3: TComboBox
+      Left = 452
+      Top = 47
+      Width = 69
+      Height = 23
+      ItemIndex = 0
+      TabOrder = 6
+      Text = 'Surface'
+      Items.Strings = (
+        'Surface'
+        'Border'
+        '')
     end
   end
   object Edit1: TEdit
