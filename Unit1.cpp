@@ -294,7 +294,7 @@ void TForm1::readLog(TStringList* imglog)
 		{
 			i++;
 			int w = StrToInt(imglog->Strings[i]);
-			PenWidth = parametric ? w*min(pDx, pDy) : w;
+			PenWidth = parametricLog ? w*min(pDx, pDy) : w;
 
 		}
 		else if(imglog->Strings[i] == "#Rect")

@@ -173,6 +173,10 @@ void createBranch(Graph <TStringList*, NodeData> *g, Node<TStringList*, NodeData
 
 void moveBackward(Node<TStringList*, NodeData>* cur)
 {
+	if (cur->data.prev->data->Count == 0)
+	{
+        return;
+	}
 	String currentStr;
     bool parametric = false;
 	do
@@ -212,6 +216,11 @@ void moveBackward(Node<TStringList*, NodeData>* cur)
 
 void moveForward(Node<TStringList*, NodeData>* cur)
 {
+	if (cur->data.next->data->Count == 0)
+	{
+        return;
+	}
+
 	String currentStr = cur->data.next->data->Strings[0];
     bool parametric = false;
 	do

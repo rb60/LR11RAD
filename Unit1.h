@@ -14,6 +14,8 @@
 #include <Vcl.NumberBox.hpp>
 #include <jpeg.hpp>
 #include <pngimage.hpp>
+#include <System.ImageList.hpp>
+#include <Vcl.ImgList.hpp>
 //---------------------------------------------------------------------------
 class TForm1 : public TForm
 {
@@ -62,6 +64,7 @@ __published:	// IDE-managed Components
 	TMenuItem *oCanvas2;
 	TMenuItem *AsBMPImage1;
 	TScrollBox *ScrollBox1;
+	TImageList *ImageList1;
 	void __fastcall Image1MouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall Image1MouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
